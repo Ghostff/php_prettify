@@ -1,6 +1,8 @@
 # PHP Code colors
 
-Renders your display PHP code into a beautiful IDE type color and indented code
+Renders your display PHP code into a beautiful IDE type color and indented code. 
+
+Note: this is a sub-version thus lesser functionality referre to [This](http://ghostff.com/demo/oop/?Php_Code_Color=php#ext)for full function.
 
 1: passing as a string
 
