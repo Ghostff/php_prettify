@@ -2,7 +2,7 @@
 
 Renders your display PHP code into a beautiful IDE type color and indented code. 
 
-Note: this is a sub-version thus lesser functionality referre to [php prettify external](http://ghostff.com/demo/oop/?Php_Code_Color=php#ext) for full function.
+Note: this is a sub-version thus lesser functionality referre to [php prettify external](http://ghostff.com/oop/?Php_Code_Color=php#ext) for full function.
 
 1: passing as a string
 
