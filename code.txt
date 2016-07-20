@@ -1,0 +1,15 @@
+<?php   
+ 
+class Form extends Http
+{
+    public function __construct($request)
+    {
+        if (trim($request) == 'POST')
+        {
+            echo 'You just made a' . strtolower($request);
+        }
+    }
+}
+
+new Form($_SERVER['REQUEST_METHOD']);
+//outputs You just made a post
