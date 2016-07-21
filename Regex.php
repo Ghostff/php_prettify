@@ -1,12 +1,22 @@
 <?php
 class Regex
 {
-    protected static $qot_arr = '/"(.*?)(?<!\\\\)"|\'(.*?)(?<!\\\\)\'/s';        /* 'var' */
+    protected static $qot_arr = array(
+					'/"(.*?)(?<!\\\\)"/s',
+					"/'(.*?)(?<!\\\\)'/s"
+	);
     
-    protected static $com_arr = '/\/\/(.*)|#(.*)/';
+    protected static $com_arr = '/\/\/(.*?)|#(.*?)$/';
+	protected static $mcm_arr = '/\/\*(.*?)\*\//s';
+	
+	protected static $con_arr = '/\b(?<!\$)[A-Z_][A-Z0-9_](\(+)+/';
     
-    protected static $var_arr = array('/\$[\w\$]+/');                /* $var */
-    
+	protected static $num_arr = '/\b[\d]+\b/';
+						
+	
+	
+    protected static $var_arr = array('/\$[a-zA-Z_]+[a-zA-Z0-9_]*/');                /* $var */
+	
     protected static $tag_arr = array(
                     '/&lt;\?php\b/',         /* <?php */
                     '/(?<!\b)\?&gt;/',        /* ?>*/
@@ -14,11 +24,29 @@ class Regex
     
     protected static $adn_arr = array(
                     '/\bfunction\b/',
+					'/null\b/',
                     '/\=/',
                     '/\./',
                     '/\!/',
+					'/\+/',
+					'/\-/',
+					'/\:/',
+					'/\@/',
+					'/&gt;|&lt;/',
+					'/&amp;/',
                     
     );
+	
+	protected static $cst_arr = array(
+					'/(\(\s*int\s*\))/',
+					'/(\(\s*string\s*\))/',
+					'/(\(\s*float\s*\))/',
+					'/(\(\s*array\s*\))/',
+					'/(\(\s*object\s*\))/',
+					'/(\(\s*unset\s*\))/',
+					'/(\(\s*binary\s*\))/',
+					'/(\(\s*bool\s*\))/'
+	);
     
     protected static $stm_arr = array(
                     '/(?<!\$|\w)public\b/',

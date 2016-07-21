@@ -18,21 +18,14 @@ class CodeHighlight extends Regex
     private static $adn = 'blue';
 	
     private static $com = '#FEA500';
-    
-    /*
-    * Assigns a tag and style to a particular string
-    *
-    * returns string
-    * @param string to be styled
-    * @param color to be assigned
-    */
-    private static function color($string, $color)
-    {
-        if (substr($color, 0, 1) == '#') {
-            $color = str_replace('#', '~~', $color);    
-        }
-        return '<span style*~~color:' . $color. ';~~>' . $string .'<~~span>';
-    }
+	
+	private static $con = '#8c4d03';
+	
+	private static $num = 'purple';
+	
+	private static $cst = '#038c8c';
+	
+	private static $italic_comment = true;
     
     /*
     * Perform a regular expression search and replace
@@ -50,6 +43,24 @@ class CodeHighlight extends Regex
         return preg_replace($pattern, $replacement, $subject);
     }
     
+	/*
+    * Assigns a tag and style to a particular string
+    *
+    * returns string
+    * @param string to be styled
+    * @param color to be assigned
+    */
+    private static function color($string, $color, $font = null)
+    {
+        if (substr($color, 0, 1) == '#') {
+            $color = str_replace('#', '~~', $color);    
+        }
+		if ($font && self::$italic_comment) {
+			$font = ';font-style~italic';	
+		}
+		return '~SO'. $color . $font . '~SM' . $string . '~SC';
+    }
+	
     /*
     * Converts *~~ and ~~ added on compile time with =" and "
     * an many more due to some html elements matches with
@@ -59,23 +70,42 @@ class CodeHighlight extends Regex
     * tags that matches and thus creating an unreausabel
     * string
     *
-    * case 1 e\*~~
-    * case 2 ;~~>
-    * case 3 <~~s
-    * case 4 lor:~~
+    * case 1 ~SO
+    * case 2 ~SM
+    * case 3 ~SC
+    * case 4 color:~~
     * returns string
     * @param unreplaced string
     */
     private static function makeQoute($code)
     {
-        $pattern = array("/e\*~~/", "/;~~>/", "/<~~s/", "/lor:~~/");
-        $replacement = array('e="', ';">', "</s", "lor:#");
-        return self::PR($pattern, $replacement, $code);
+        $pattern = array('/~SO/', '/color:~~/',
+						 '/~SM/', '/~SC/',
+						);
+						
+        $replacement = array('<span style="color:',
+							 'color:#',  ';">', '</span>'
+						);
+						
+       return preg_replace($pattern, $replacement, $code);
     }
-
+	
+	/*
+    * strips the custom tage we made at self::color
+	*
+    * returns string
+    * @param string to striped
+    */
+	public static function strip($string)
+	{
+		$pathern = '/~SO(.*?)~SM(.*?)~SC/';
+		return preg_replace($pathern, "$2", $string);
+	}
+	
+	
     /*
     * searches and strips out any code styling 
-    * inside comment block
+    * inside single line comment block
     *
     * returns string
     * @param string to search
@@ -84,27 +114,31 @@ class CodeHighlight extends Regex
     {
         if (preg_match(self::$com_arr, $code, $matches)) {
             $code = str_replace($matches[0],  
-                    self::color(strip_tags($matches[0]), self::$com),
-                    $code);
+                    self::color(self::strip($matches[0]),
+					self::$com, true), $code);
         }
         return $code;
     }
     
     /*
     * searches and strips out any code styling 
-    * inside comment qoute block
+    * inside multi line comment or qoute block
     *
     * returns string
     * @param string to search
     */
-    private static function stripInQoutes($code)
+    private static function stripTags($code)
     {
-        if (preg_match(self::$qot_arr, $code, $matches)) {
-            $code = str_replace($matches[0],  
-                    self::color(strip_tags($matches[0]), self::$qot),
-                    $code);
-        }
-        return $code;
+		var_dump($code);
+		if (preg_match_all('/`~(.*?)~`/', $code, $matches)) {
+
+			var_dump(array_map(array('self','strip'), $matches[1]));
+			
+			$code = str_replace($matches[0],
+					array_map(array('self','strip'), $matches[1]),
+					$code);
+		}
+		return $code;
     }
     
     /*
@@ -119,9 +153,7 @@ class CodeHighlight extends Regex
         foreach (preg_split ('/$\R?^/m', $code) as $code_lines) {
             
             $code_lines = self::stripinComments($code_lines);
-            $code_lines = self::stripInQoutes($code_lines);
-            
-            
+
             $replaced .= $code_lines;
             preg_match_all("/([\w]+)(\s*)\(/", $code_lines, $matches);
                 foreach ($matches[1] as $function) {
@@ -138,13 +170,19 @@ class CodeHighlight extends Regex
     
     private static function format($code)
     {
-        $code = htmlspecialchars($code);
+        $code = htmlspecialchars($code, ENT_NOQUOTES);
+		$code = self::PR(self::$con_arr, self::color("$0", self::$con), $code);
         $code = self::PR(self::$tag_arr, self::color("$0", self::$tag), $code);
         $code = self::PR(self::$stm_arr, self::color("$0", self::$stm), $code);
         $code = self::PR(self::$var_arr, self::color("$0", self::$var), $code);
         $code = self::PR(self::$adn_arr, self::color("$0", self::$adn), $code);
+		$code = self::PR(self::$cst_arr, self::color("$0", self::$cst), $code);
+		$code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
+		$code = self::PR(self::$qot_arr, self::color("`~$0~`", self::$qot), $code);
+		$code = self::PR(self::$mcm_arr, self::color("`~$0~`", self::$com), $code);
         $code = self::isPreDef($code);
-        echo '<pre>' .  self::makeQoute($code) . '<pre>';
+		$code = self::stripTags($code);
+        return '<pre>' .  self::makeQoute($code) . '<pre>';
     }
     
     /*
