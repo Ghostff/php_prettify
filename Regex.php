@@ -2,27 +2,34 @@
 class Regex
 {
     protected static $qot_arr = array(
-					'/"(.*?)(?<!\\\\)"/s',
-					"/'(.*?)(?<!\\\\)'/s"
+					'/"(.*?)(?<!\\\\)"/s', 						/* qoutes: 'var' */
+					"/'(.*?)(?<!\\\\)'/s"						/* qoutes: "var" */
 	);
     
-    protected static $com_arr = '/\/\/(.*?)|#(.*?)$/';
-	protected static $mcm_arr = '/\/\*(.*?)\*\//s';
+    protected static $com_arr = '/\/\/(.+)|#(.+)$/';			/* comments: //var or #var */
+	protected static $mcm_arr = '/\/\*(.*?)\*\//s';				/* multy line comments: var  */
 	
-	protected static $con_arr = '/\b(?<!\$)[A-Z_][A-Z0-9_](\(+)+/';
+	protected static $con_arr = array(
+					'/([A-Z_][A-Z0-9_][^\(].*)/'				/* constants: VAR */
+	);
     
-	protected static $num_arr = '/\b[\d]+\b/';
+	protected static $num_arr = '/(?:^|\s*)(?<!#)[\d]*?(\s)/';	/* numbers: 0-9 */
 						
+	protected static $ocb_arr = '/\(|\)/';						/* ( and ) */
+	
+	protected static $occ_arr = '/\{|\}/';						/* { and } */
 	
 	
-    protected static $var_arr = array('/\$[a-zA-Z_]+[a-zA-Z0-9_]*/');                /* $var */
+    protected static $var_arr = array(
+					'/\$[a-zA-Z_]+[a-zA-Z0-9_]*/'				/* varables: $var */
+	);
 	
     protected static $tag_arr = array(
-                    '/&lt;\?php\b/',         /* <?php */
-                    '/(?<!\b)\?&gt;/',        /* ?>*/
+                    '/&lt;\?php\b/',         					/* php start tag <?php */
+                    '/(?<!\b)\?&gt;/',        					/* php end tag ?>*/
     );
     
-    protected static $adn_arr = array(
+    protected static $adn_arr = array(							/* special characters */
                     '/\bfunction\b/',
 					'/null\b/',
                     '/\=/',
@@ -32,12 +39,14 @@ class Regex
 					'/\-/',
 					'/\:/',
 					'/\@/',
-					'/&gt;|&lt;/',
-					'/&amp;/',
+					'/\|/',
+					'/\?/',
+					'/&gt;|&lt;/',								/* < or  > */
+					'/&amp;/',									/* & */
                     
     );
 	
-	protected static $cst_arr = array(
+	protected static $cst_arr = array(							/* casting (var) */
 					'/(\(\s*int\s*\))/',
 					'/(\(\s*string\s*\))/',
 					'/(\(\s*float\s*\))/',
@@ -57,7 +66,7 @@ class Regex
                     '/(?<!\$|\w)new /',
                     '/(?<!\$|\w)extends /',
                     '/(?<!\$|\w)echo\b/',
-                    '/(?<!\$|\w)static /',
+                    '/(?<!\$|\b)static/',
                     '/(?<!\$|\w)foreach\b/',
                     '/(?<!\$|\w)self\b/',
                     '/(?<!\$|\w)return\b/',

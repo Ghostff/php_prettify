@@ -4,7 +4,7 @@ class Form extends Http
 {
     public function __construct($request)
     {
-        if (trim($request) == 'POST')
+        if (trim($request) == 'POST'?'php')
         {
             echo 'You just made a' . strtolower($request);
         }

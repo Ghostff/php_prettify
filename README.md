@@ -10,6 +10,6 @@ Renders your display PHP code into a beautiful colored code.
     require 'CodeHighlight.php';
 
     //using custom color
-    //CodeHighlight::setColor('stm', 'purple');
+    //CodeHighlight::set('stm', 'purple');
     echo CodeHighlight::render('code.txt', true);
 ```
