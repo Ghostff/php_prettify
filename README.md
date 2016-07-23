@@ -13,6 +13,6 @@ Renders your display PHP code into a beautiful colored code.
     //CodeHighlight::set('stm', 'purple');
     echo CodeHighlight::render('code.txt', true);
     
-    ![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/dark.png)
-    
 ```
+![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/dark.png)
+![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/light.png)
