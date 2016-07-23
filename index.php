@@ -3,20 +3,43 @@
 require 'CodeHighlight.php';
 
 /*
-CodeHighlight::set('stm', '#52D017');
-CodeHighlight::set('tag', '#52D017');
-CodeHighlight::set('qot', '#52D017');
-CodeHighlight::set('var', '#52D017');
-CodeHighlight::set('prd', '#52D017');
-CodeHighlight::set('adn', '#52D017');
-CodeHighlight::set('com', '#52D017');
-CodeHighlight::set('con', '#52D017');
-CodeHighlight::set('num', '#52D017');
-CodeHighlight::set('cst', '#52D017');
-CodeHighlight::set('ocb', '#52D017');
-CodeHighlight::set('occ', '#52D017');
-CodeHighlight::set('italic_comment', true);
-
+echo '<body style="background:#282c34;color:#FFFFFF">';
+CodeHighlight::set('stm', '#48d5f0');			// general (if, else, class, private) ...
+CodeHighlight::set('tag', '#f200fb');			// for php open and close tage (<?php ..)
+CodeHighlight::set('qot', '#96d668');			// for qoutes ("..." or  '...')
+CodeHighlight::set('var', '#e89c51');			// for defined variable ($var_name) ...
+CodeHighlight::set('prd', '#fd1344');			// for php function (eval, strstr) ...	
+CodeHighlight::set('adn', '#c66cad');			// for php allowes special chars (=, -, +) ...
+CodeHighlight::set('com', '#969595');			// for comments
+CodeHighlight::set('con', '#e06c75');			// for constants A-Z_ alone
+CodeHighlight::set('num', '#e7db1d');			// for numbers 0-9
+CodeHighlight::set('cst', '#50ffb3');			// for casting (string) ...
+CodeHighlight::set('ocb', '#50ffb3');			// for ( )
+CodeHighlight::set('occ', '#FFFFFF');			// for { }
+CodeHighlight::set('bbk', '#FFFFFF'); 			// for [ ]
+CodeHighlight::set('italic_comment', true); 	// makes all comment font style italic
+CodeHighlight::set('allow_esc', true);  		// converts her\'s to her's
 
 */
+/*
+*
+* if passing as a file remember to replace all (') with (\')
+* eg (she's home) with (she\'s home). If neglected it might comment out
+* most of your codes. 
+*
+* With the 'allow_esc' on it will output
+*  (she's home) and if off it will output (she\'s home)
+*
+*/
 echo CodeHighlight::render('code.txt', true);
+
+				
+
+/*$m = '
+color:#234;
+567;
+891 ;
+;
+preg_match_all('/(?:^|\s*)(?<!#)[\d]*?\s/', $m, $ma);
+var_dump(array_map('trim', $ma[0]));*/
+

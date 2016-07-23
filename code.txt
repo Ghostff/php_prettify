@@ -1,15 +1,35 @@
-<?php   
- 
-class Form extends Http
+<?php
+
+/*
+*
+* LIGHT VERSION
+* You can list all arguments using 
+* ReflectionFunction class
+*
+*/
+
+class ClassTest
 {
-    public function __construct($request)
+    public static function FunctionTest($value = array())
     {
-        if (trim($request) == 'POST'?'php')
-        {
-            echo 'You just made a' . strtolower($request);
+        $functions = get_defined_functions();
+        ( array ) $functions_list = $value;
+        foreach ($functions['user'] as $func) {
+            $f = new ReflectionFunction($func);
+            $args = array();
+            foreach ($f->getParameters() as $param) {
+                $tmparg = null;
+                if ($param->isPassedByReference()) $tmparg = '&';
+                if ($param->isOptional()) {
+                    $tmparg = '[' . $tmparg . '$' . $param->getName() . ' = ' . $param->getDefaultValue() . ']';
+                } else {
+                    $tmparg.= '&' . $param->getName();
+                }
+                $args[] = trim($tmparg);
+                unset ($tmparg);
+            }
+            $functions_list[] = 'function ' . $func . ' ( ' . implode(', ', $args) . ' )' . PHP_EOL;
         }
+        print_r($functions_list);
     }
 }
-
-new Form($_SERVER['REQUEST_METHOD']);
-//outputs You just made a post

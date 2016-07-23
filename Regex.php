@@ -2,22 +2,23 @@
 class Regex
 {
     protected static $qot_arr = array(
-                    '/"(.*?)(?<!\\\\)"/s',                       /* qoutes: 'var' */
-                    "/'(.*?)(?<!\\\\)'/s"                        /* qoutes: "var" */
+                    '/(?<!\\\\)"(.*?)(?<!\\\\)"/s',             /* qoutes: 'var' */
+                    "/(?<!\\\\)'(.*?)(?<!\\\\)'/s"                 /* qoutes: "var" */
     );
+    
+    protected static $mut_arr = '/\*/';                            /* comments: //var or #var */
     
     protected static $com_arr = '/\/\/(.+)|#(.+)$/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
-    
-    protected static $con_arr = array(
-                    '/([A-Z_][A-Z0-9_][^\(].*)/'                /* constants: VAR */
-    );
+
     
     protected static $num_arr = '/(?:^|\s*)(?<!#)[\d]*?(\s)/';  /* numbers: 0-9 */
                         
     protected static $ocb_arr = '/\(|\)/';                      /* ( and ) */
     
     protected static $occ_arr = '/\{|\}/';                      /* { and } */
+    
+    protected static $bbk_arr = '/\[|\]/';                      /* { and } */
     
     
     protected static $var_arr = array(
@@ -36,13 +37,14 @@ class Regex
                     '/\./',
                     '/\!/',
                     '/\+/',
+                    '/\%/',
                     '/\-/',
                     '/\:/',
                     '/\@/',
-                    '/\|/',
+                    '/\||\bor\b/',
                     '/\?/',
-                    '/&gt;|&lt;/',                              /* < or  > */
-                    '/&amp;/',                                  /* & */
+                    '/&gt;|&lt;/',                               /* < or  > */
+                    '/&amp;|\band\b|\bAND\b/',                  /* &, and or AND */
                     
     );
     
@@ -66,7 +68,7 @@ class Regex
                     '/(?<!\$|\w)new /',
                     '/(?<!\$|\w)extends /',
                     '/(?<!\$|\w)echo\b/',
-                    '/(?<!\$|\b)static/',
+                    '/(?<!\$)static/',
                     '/(?<!\$|\w)foreach\b/',
                     '/(?<!\$|\w)self\b/',
                     '/(?<!\$|\w)return\b/',
@@ -85,10 +87,12 @@ class Regex
                     '/(?<!\$|\w)exit\b/',
                     '/(?<!\$|\w)die\b/',
                     '/(?<!\$|\w)as /',
-                    '/(?<!\$|\w)array\b/',
+                    '/(?<!\$|\w)array\s*\(/',
+					'/(?<!\$|\w)EOD\b/',
                     '/(?<!\$|\w)global /',
                     '/(?<!\$|\w)namespace /',
                     '/(?<!\$|\w)use /',
+                    '/(?<!\$|\w)var /',
                     '/(?<!\$|\w)const /',
                     '/(?<!\$|\w)require_once\b/',
                     '/(?<!\$|\w)require\b/',
