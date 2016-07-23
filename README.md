@@ -9,8 +9,13 @@ Renders your display PHP code into a beautiful colored code.
  <?php
     require 'CodeHighlight.php';
 
-    //using custom color
-    //CodeHighlight::set('stm', 'purple');
+    /*
+    *
+    * @param file name or string of php code
+    * @param use to identify if code if a file(true) or string(false) default: false
+    *
+    */
+    
     echo CodeHighlight::render('code.txt', true);
     
 ```

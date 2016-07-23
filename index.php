@@ -33,13 +33,4 @@ CodeHighlight::set('allow_esc', true);  		// converts her\'s to her's
 */
 echo CodeHighlight::render('code.txt', true);
 
-				
-
-/*$m = '
-color:#234;
-567;
-891 ;
-;
-preg_match_all('/(?:^|\s*)(?<!#)[\d]*?\s/', $m, $ma);
-var_dump(array_map('trim', $ma[0]));*/
 
