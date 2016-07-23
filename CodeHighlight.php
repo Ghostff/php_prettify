@@ -191,8 +191,8 @@ class CodeHighlight extends Regex
         $const_num = preg_split('/[\.\+\-\*\&\%\@\!\,\(\)\;]+/', $code_line);
         foreach ($const_num as $new_cn) {
             if (preg_match('/^[A-Z_]+$/', trim($new_cn), $matches)) {
-				
-				/* make sure matched constant is not TRUE, FALSE or NULL */
+                
+                /* make sure matched constant is not TRUE, FALSE or NULL */
                 if (!in_array($matches[0], array('TRUE', 'FALSE', 'NULL'))) {
                     $code = str_replace($matches[0], 
                                 self::color($matches[0], self::$con),
@@ -218,19 +218,19 @@ class CodeHighlight extends Regex
 
             $replaced .= $code_lines;
             preg_match_all("/([\w]+)(\s*)\(/", $code_lines, $matches);
-				/*
-				*
-				* lets sort arrays by string lenght to prevent function like
-				* time overiding function like strtotime.
-				*
-				* we wonna make sure it goes from function with more character
-				* to function functions with less characters
-				*
-				*/
-				usort($matches[1], function($match, $with){
-					return strlen($with) - strlen($match);
-				});
-				
+                /*
+                *
+                * lets sort arrays by string lenght to prevent function like
+                * time overiding function like strtotime.
+                *
+                * we wonna make sure it goes from function with more character
+                * to function functions with less characters
+                *
+                */
+                usort($matches[1], function($match, $with){
+                    return strlen($with) - strlen($match);
+                });
+                
                 foreach ($matches[1] as $function) {
                     $function = ltrim($function, '~SC');
                     if (function_exists($function)) {
@@ -252,7 +252,7 @@ class CodeHighlight extends Regex
         $code = self::PR(self::$var_arr, self::color("$0", self::$var), $code);
         $code = self::PR(self::$adn_arr, self::color("$0", self::$adn), $code);
         $code = self::PR(self::$cst_arr, self::color("$0", self::$cst), $code);
-       	$code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
+        $code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
         $code = self::PR(self::$occ_arr, self::color("$0", self::$occ), $code);
         $code = self::PR(self::$qot_arr, self::color("$0", self::$qot, 'cls'), $code);
         $code = self::PR(self::$mcm_arr, self::color("$0", self::$com, 'clf'), $code);
