@@ -12,7 +12,7 @@ Renders your display PHP code into a beautiful colored code.
     /*
     *
     * @param file name or string of php code
-    * @param use to identify if code if a file(true) or string(false) default: false
+    * @param use to identify if code is a file(true) or string(false) default: false
     *
     */
     
