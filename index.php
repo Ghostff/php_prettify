@@ -3,6 +3,9 @@
 require 'CodeHighlight.php';
 
 /*
+
+SETTING FOR DARK THEME
+
 echo '<body style="background:#282c34;color:#FFFFFF">';
 CodeHighlight::set('stm', '#48d5f0');			// general (if, else, class, private) ...
 CodeHighlight::set('tag', '#f200fb');			// for php open and close tage (<?php ..)
@@ -21,6 +24,7 @@ CodeHighlight::set('italic_comment', true); 	// makes all comment font style ita
 CodeHighlight::set('allow_esc', true);  		// converts her\'s to her's
 
 */
+
 /*
 *
 * if passing as a file remember to replace all (') with (\')
@@ -31,6 +35,16 @@ CodeHighlight::set('allow_esc', true);  		// converts her\'s to her's
 *  (she's home) and if off it will output (she\'s home)
 *
 */
+
 echo CodeHighlight::render('code.txt', true);
 
+				
+
+/*$m = '
+color:#234;
+567;
+891 ;
+;
+preg_match_all('/(?:^|\s*)(?<!#)[\d]*?\s/', $m, $ma);
+var_dump(array_map('trim', $ma[0]));*/
 

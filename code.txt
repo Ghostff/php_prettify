@@ -12,6 +12,7 @@ class ClassTest
 {
     public static function FunctionTest($value = array())
     {
+        $count = 10 + 233;
         $functions = get_defined_functions();
         ( array ) $functions_list = $value;
         foreach ($functions['user'] as $func) {

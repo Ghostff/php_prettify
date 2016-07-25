@@ -8,11 +8,12 @@ class Regex
     
     protected static $mut_arr = '/\*/';                            /* comments: //var or #var */
     
-    protected static $com_arr = '/\/\/(.+)|#(.+)$/';            /* comments: //var or #var */
+    protected static $com_arr = '/\/\/(.*)|#(.*)$/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     
-    protected static $num_arr = '/(?:^|\s*)(?<!#)[\d]*?(\s)/';  /* numbers: 0-9 */
+    protected static $num_arr = '
+        /(?:^|\s*)(?<!SO~~)(\d+)(?=\s|\;|\.|\+|\-|\*|\&|\%|\@|\!|\,|\)|\]|\})/';  /* numbers: 0-9 */
                         
     protected static $ocb_arr = '/\(|\)/';                      /* ( and ) */
     
@@ -76,19 +77,19 @@ class Regex
                     '/(?<!\$|\w)else\b/',
                     '/(?<!\$|\w)else if\b/',
                     '/(?<!\$|\w)elseif\b/',
-                    '/(?<!\$|\w)true\b/',
-                    '/(?<!\$|\w)false\b/',
+                    '/(?<!\$|\w)true|TRUE\b/',
+                    '/(?<!\$|\w)false|FALSE\b/',
                     '/(?<!\$|\w)empty\b/',
                     '/(?<!\$|\w)isset\b/',
                     '/(?<!\$|\w)unlink/',
                     '/(?<!\$|\w)unset\b/',
-                    '/(?<!\$|\w)NULL\b/',
+                    '/(?<!\$|\w)null|NULL\b/',
                     '/(?<!\$|\w)break /',
                     '/(?<!\$|\w)exit\b/',
                     '/(?<!\$|\w)die\b/',
                     '/(?<!\$|\w)as /',
                     '/(?<!\$|\w)array\s*\(/',
-					'/(?<!\$|\w)EOD\b/',
+                    '/(?<!\$|\w)EOD\b/',
                     '/(?<!\$|\w)global /',
                     '/(?<!\$|\w)namespace /',
                     '/(?<!\$|\w)use /',
