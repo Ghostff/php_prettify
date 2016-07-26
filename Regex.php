@@ -3,13 +3,13 @@ class Regex
 {
     protected static $qot_arr = array(
                     '/(?<!\\\\)"(.*?)(?<!\\\\)"/s',             /* qoutes: 'var' */
-                    "/(?<!\\\\)'(.*?)(?<!\\\\)'/s"                 /* qoutes: "var" */
+                    "/(?<!\\\\)'(.*?)(?<!\\\\)'/s"              /* qoutes: "var" */
     );
     
-    protected static $mut_arr = '/\*/';                            /* comments: //var or #var */
+    protected static $mut_arr = '/\*/';                         /* comments: //var or #var */
     
     protected static $com_arr = '
-        /(?<!https~SO~~0000FF~SM:~SC|http~SO~~0000FF~SM:~SC)\/\/(.*)|#(.*)$/';            /* comments: //var or #var */
+        /http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|#(.*)$/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     
@@ -32,12 +32,6 @@ class Regex
                     '/(?<!\b)\?&gt;/',                          /* php end tag ?>*/
     );
     
-    protected static $com_addslash = '
-            /(?<!https:|http:)\/\/(.*)(\'|\").*|\#(.*)(\'|\").*/';
-    
-    protected static $mcm_addslash = '
-            /\/\*(.*?)(\'|\").*?\*\//s';
-    
     protected static $adn_arr = array(                          /* special characters */
                     '/\bfunction\b/',
                     '/null\b/',
@@ -51,7 +45,7 @@ class Regex
                     '/\@/',
                     '/\||\bor\b/',
                     '/\?/',
-                    '/&gt;|&lt;/',                               /* < or  > */
+                    '/&gt;|&lt;/',                              /* < or  > */
                     '/&amp;|\band\b|\bAND\b/',                  /* &, and or AND */
                     
     );

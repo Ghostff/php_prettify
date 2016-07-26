@@ -1,4 +1,5 @@
 <?php
+
 require 'CodeHighlight.php';
 
 /*
@@ -18,9 +19,10 @@ CodeHighlight::set('num', '#e7db1d');            // for numbers 0-9
 CodeHighlight::set('cst', '#50ffb3');            // for casting (string) ...
 CodeHighlight::set('ocb', '#50ffb3');            // for ( )
 CodeHighlight::set('occ', '#FFFFFF');            // for { }
-CodeHighlight::set('bbk', '#FFFFFF');             // for [ ]
-CodeHighlight::set('italic_comment', true);     // makes all comment font style italic
-CodeHighlight::set('allow_esc', true);          // converts her\'s to her's
+CodeHighlight::set('bbk', '#FFFFFF');            // for [ ]
+CodeHighlight::set('allow_esc', true);           // converts her\'s to her's before outputing
+CodeHighlight::set('add_slashes', true);         // converts the he's to he\'s in comments block
+CodeHighlight::set('italic_comment', true);      // makes all comment font style italic
 
 */
 
@@ -36,14 +38,4 @@ CodeHighlight::set('allow_esc', true);          // converts her\'s to her's
 */
 
 echo CodeHighlight::render('code.txt', true);
-
-                
-
-/*$m = '
-color:#234;
-567;
-891 ;
-;
-preg_match_all('/(?:^|\s*)(?<!#)[\d]*?\s/', $m, $ma);
-var_dump(array_map('trim', $ma[0]));*/
 

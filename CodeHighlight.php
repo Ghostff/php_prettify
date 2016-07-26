@@ -59,15 +59,9 @@ class CodeHighlight extends Regex
     */
     private static function addSlashes($string)
     {
-        /*preg_match_all(self::$com_addslash, $string, $matches);
-        foreach ($matches[0] as $matched) {
-            $string = str_replace($matched, addslashes($matched), $string);        
+        if (is_array($string) && self::$add_slashes) {
+            $string = addslashes($string[0]);
         }
-        preg_match_all(self::$mcm_addslash, $string, $matches);
-        var_dump($matches);
-        foreach ($matches[0] as $matched) {
-            $string = str_replace($matched, addslashes($matched), $string);        
-        }*/
         return $string;
     }
     
@@ -81,9 +75,11 @@ class CodeHighlight extends Regex
     private static function stripTags($code)
     {
         $code .= '
-        <script>var p = document.getElementsByClassName("stp");
+        <script>
+            var p = document.getElementsByClassName("stp");
             for(i = 0; i < p.length; i++) {
-                p[i].innerHTML = p[i].innerHTML.replace(/<(?!br\s*\/?)[^>]+>/g, "");
+                p[i].innerHTML = 
+                p[i].innerHTML.replace(/<(?!br\s*\/?)[^>]+>/g, "");
             }
         </script>
         ';
@@ -95,49 +91,68 @@ class CodeHighlight extends Regex
     }
     
     /*
-    * Perform a regular expression search and replace
-    *
-    * returns string
-    * @param The pattern to search for. It can be 
-    * either a string or an array with strings
-    *
-    * @param The string or an array with strings to replace
-    * @param The string or an array with strings to 
-    * search and replace
-    */
-    private static function PR($pattern, $replacement, $subject)
-    {
-        return preg_replace($pattern, $replacement, $subject);
-    }
-    
-    /*
     * Assigns a tag and style to a particular string
     *
     * returns string
     * @param string to be styled
     * @param color to be assigned
     */
-    private static function color($string, $color, $font = null)
+    private static function color($string, $color = null, $font = null)
     {
         $cls = '~SM';
-        
-        if (substr($color, 0, 1) == '#') {
-            $color = str_replace('#', '~~', $color);    
+        if ($color) {
+            if (substr($color, 0, 1) == '#') {
+                $color = str_replace('#', '~~', $color);    
+            }
+            if ($font == 'cls') {
+                $font = null;
+                $cls = '~CSM';
+            }
         }
-        if ($font == 'fnt' && self::$italic_comment) {
-            $font = ';font-style~italic';    
-        }
-        elseif ($font == 'cls') {
-            $font = null;
-            $cls = '~CSM';
-        }
-        elseif ($font == 'clf') {
-            $font = ';font-style~italic';
-            $cls = '~CSM';
+        else {
+            $color = self::$com;
+            $cls = '~CSM';    
+            $string = self::addSlashes($string);
+
+            if (substr($color, 0, 1) == '#') {
+                $color = str_replace('#', '~~', $color);    
+            }
+            if (self::$italic_comment) {
+                $font = ';font-style~italic';    
+            }    
         }
         return '~SO'. $color . $font . $cls . $string . '~SC';
     }
-    
+    /*
+    * Perform a regular expression search and replace
+    *
+    * returns string
+    * @param The pattern to search for. It can be 
+    * either a string or an array with strings
+    *
+    * @param A callback that will be called and passed an array of 
+    * matched elements in the subject string. The callback 
+    * should return the replacement string. This is the 
+    * callback signature:
+    * ----OR
+    * @param The string or an array with strings to replace
+    *
+    * @param The string or an array with strings to 
+    * search and replace
+    */
+    private static function PR($pattern, $callrepl, $subject = null)
+    {
+        if ($subject) {
+            return preg_replace($pattern, $callrepl, $subject);
+        }
+        else {
+            return preg_replace_callback($pattern,
+                                array('self', 'color'),
+                                $callrepl
+                            );
+        }
+    }
+
     /*
     * Converts *~~ and ~~ added on compile time with =" and "
     * an many more due to some html elements matches with
@@ -169,14 +184,9 @@ class CodeHighlight extends Regex
                              'color:#',  ';">', '</span>',
                              ';" class="stp">', 'yle:ital'
                         );
-                        
+                                      
        $code =  preg_replace($pattern, $replacement, $code);
-       if ($strip) {
-            return self::stripTags($code);  
-       }
-       else {
-           return $code;
-       }
+       return self::stripTags($code);  
     }
     
 
@@ -192,6 +202,7 @@ class CodeHighlight extends Regex
         return preg_replace($pathern, "$2", $string);
     }
     
+    
     /*
     * searches and strips out any code styling 
     * inside single line comment block
@@ -201,12 +212,7 @@ class CodeHighlight extends Regex
     */
     private static function stripinComments($code, $check_back = false)
     {
-        if (preg_match(self::$com_arr, $code, $matches)) {
-            $code = str_replace($matches[0],  
-                    self::color(strip_tags(
-                    self::makeQoute($matches[0], false)),
-                    self::$com, 'clf'), $code);
-        }
+        $code = self::PR(self::$com_arr, $code);
         return $code;
     }
        
@@ -220,7 +226,7 @@ class CodeHighlight extends Regex
     private static function MatchConst($code)
     {
         $code_line = self::strip($code);
-        $const_num = preg_split('/[\.\+\-\*\&\%\@\!\,\(\)\;\=\<\>]+/', $code_line);
+        $const_num = preg_split('/[\.\+\-\*\&\%\@\!\,\(\)\;\=\<\>\[\]]+/', $code_line);
         foreach ($const_num as $new_cn) {
             if (preg_match('/^[A-Z_]+$/', ltrim(trim($new_cn), 'const '), $matches)) {
                 
@@ -274,9 +280,7 @@ class CodeHighlight extends Regex
                         $replaced = self::PR($pathern, 
                                         self::color($function . '(', 
                                         self::$prd), $replaced
-                                    );
-                                    
-                        
+                                    );    
                     }
                 }
         }
@@ -285,23 +289,28 @@ class CodeHighlight extends Regex
     
     private static function format($code)
     {
+        define('C', 'cls');
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $code = self::addSlashes($code);
-        $code = self::PR(self::$tag_arr, self::color("$0", self::$tag, 'cls'), $code);
+        $code = self::PR(self::$tag_arr, self::color("$0", self::$tag, C), $code);
         $code = self::PR(self::$stm_arr, self::color("$0", self::$stm), $code);
         $code = self::PR(self::$var_arr, self::color("$0", self::$var), $code);
         $code = self::PR(self::$adn_arr, self::color("$0", self::$adn), $code);
         $code = self::PR(self::$cst_arr, self::color("$0", self::$cst), $code);
-           $code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
+        $code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
         $code = self::PR(self::$occ_arr, self::color("$0", self::$occ), $code);
-        $code = self::PR(self::$qot_arr, self::color("$0", self::$qot, 'cls'), $code);
-        $code = self::PR(self::$mcm_arr, self::color("$0", self::$com, 'clf'), $code);
+        
+        $code = self::PR(self::$mcm_arr, $code);
         $code = self::PR(self::$mut_arr, self::color("$0", self::$adn), $code);
         $code = self::PR(self::$bbk_arr, self::color("$0", self::$bbk), $code);
+        
         $code = self::isPreDef($code);
+        $code = self::PR(self::$qot_arr, self::color("$0", self::$qot, C), $code);
         $code = self::PR(self::$ocb_arr, self::color("$0", self::$ocb), $code);
+        
         return '<pre>' .  self::makeQoute($code) . '<pre>';
     }
+    
     
     /*
     * chack if code is a file or a string
