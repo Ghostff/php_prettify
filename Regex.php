@@ -9,7 +9,7 @@ class Regex
     protected static $mut_arr = '/\*/';                            /* comments: //var or #var */
     
     protected static $com_arr = '
-		/(?<!https~SO~~0000FF~SM:~SC|http~SO~~0000FF~SM:~SC)\/\/(.*)|#(.*)$/';            /* comments: //var or #var */
+        /(?<!https~SO~~0000FF~SM:~SC|http~SO~~0000FF~SM:~SC)\/\/(.*)|#(.*)$/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     
@@ -31,12 +31,12 @@ class Regex
                     '/&lt;\?php\b/',                            /* php start tag <?php */
                     '/(?<!\b)\?&gt;/',                          /* php end tag ?>*/
     );
-	
-	protected static $com_addslash = '
-			/(?<!https:|http:)\/\/(.*)(\'|\").*|\#(.*)(\'|\").*/';
-	
-	protected static $mcm_addslash = '
-			/\/\*(.*?)(\'|\").*?\*\//s';
+    
+    protected static $com_addslash = '
+            /(?<!https:|http:)\/\/(.*)(\'|\").*|\#(.*)(\'|\").*/';
+    
+    protected static $mcm_addslash = '
+            /\/\*(.*?)(\'|\").*?\*\//s';
     
     protected static $adn_arr = array(                          /* special characters */
                     '/\bfunction\b/',
