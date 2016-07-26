@@ -32,8 +32,10 @@ class CodeHighlight extends Regex
     private static $bbk = '#F46164';
     
     private static $allow_esc = true;
-    
-    private static $italic_comment = true;
+	
+	private static $add_slashes = true;
+	
+	private static $italic_comment = true;
     
     
     
@@ -49,6 +51,26 @@ class CodeHighlight extends Regex
         self::$$prop_name = $values;
     }
     
+	/*
+    * add slashes to qoute inside comment or
+	* qoute box
+    *
+    * returns string
+    */
+	private static function addSlashes($string)
+	{
+		/*preg_match_all(self::$com_addslash, $string, $matches);
+		foreach ($matches[0] as $matched) {
+			$string = str_replace($matched, addslashes($matched), $string);		
+		}
+		preg_match_all(self::$mcm_addslash, $string, $matches);
+		var_dump($matches);
+		foreach ($matches[0] as $matched) {
+			$string = str_replace($matched, addslashes($matched), $string);		
+		}*/
+		return $string;
+	}
+	
     /*
     * searches and strips out any code styling 
     * inside multi line comment or qoute block
@@ -198,9 +220,9 @@ class CodeHighlight extends Regex
     private static function MatchConst($code)
     {
         $code_line = self::strip($code);
-        $const_num = preg_split('/[\.\+\-\*\&\%\@\!\,\(\)\;]+/', $code_line);
+        $const_num = preg_split('/[\.\+\-\*\&\%\@\!\,\(\)\;\=\<\>]+/', $code_line);
         foreach ($const_num as $new_cn) {
-            if (preg_match('/^[A-Z_]+$/', trim($new_cn), $matches)) {
+            if (preg_match('/^[A-Z_]+$/', ltrim(trim($new_cn), 'const '), $matches)) {
 				
 				/* make sure matched constant is not TRUE, FALSE or NULL */
                 if (!in_array($matches[0], array('TRUE', 'FALSE', 'NULL'))) {
@@ -223,7 +245,7 @@ class CodeHighlight extends Regex
     {
         $replaced = null;
         foreach (preg_split ('/$\R?^/m', $code) as $code_lines) {
-            
+            //var_dump($code_lines);
             $code_lines = self::stripinComments($code_lines);
             $code_lines = self::MatchConst($code_lines);
 
@@ -246,7 +268,9 @@ class CodeHighlight extends Regex
                     $function = ltrim($function, '~SC');
 					
                     if (function_exists($function)) {
-						$pathern = 	'/' . $function . '\s*\(/';
+						
+						//prevent custom function name highlighting
+						$pathern = 	'/(?<!function~SC )' . $function . '\s*\(/';
                         $replaced = self::PR($pathern, 
                                         self::color($function . '(', 
                                         self::$prd), $replaced
@@ -262,6 +286,7 @@ class CodeHighlight extends Regex
     private static function format($code)
     {
         $code = htmlspecialchars($code, ENT_NOQUOTES);
+		$code = self::addSlashes($code);
         $code = self::PR(self::$tag_arr, self::color("$0", self::$tag, 'cls'), $code);
         $code = self::PR(self::$stm_arr, self::color("$0", self::$stm), $code);
         $code = self::PR(self::$var_arr, self::color("$0", self::$var), $code);
