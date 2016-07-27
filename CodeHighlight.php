@@ -52,20 +52,6 @@ class CodeHighlight extends Regex
     }
     
     /*
-    * add slashes to qoute inside comment or
-    * qoute box
-    *
-    * returns string
-    */
-    private static function addSlashes($string)
-    {
-        if (is_array($string) && self::$add_slashes) {
-            $string = addslashes($string[0]);
-        }
-        return $string;
-    }
-    
-    /*
     * searches and strips out any code styling 
     * inside multi line comment or qoute block
     *
@@ -76,10 +62,10 @@ class CodeHighlight extends Regex
     {
         $code .= '
         <script>
-            var p = document.getElementsByClassName("stp");
+            var p = document.getElementsByClassName(\"stp\");
             for(i = 0; i < p.length; i++) {
                 p[i].innerHTML = 
-                p[i].innerHTML.replace(/<(?!br\s*\/?)[^>]+>/g, "");
+                p[i].innerHTML.replace(/<(?!br\s*\/?)[^>]+>/g, \"\");
             }
         </script>
         ';
@@ -100,29 +86,70 @@ class CodeHighlight extends Regex
     private static function color($string, $color = null, $font = null)
     {
         $cls = '~SM';
-        if ($color) {
-            if (substr($color, 0, 1) == '#') {
-                $color = str_replace('#', '~~', $color);    
-            }
-            if ($font == 'cls') {
-                $font = null;
-                $cls = '~CSM';
-            }
+        if (substr($color, 0, 1) == '#') {
+            $color = str_replace('#', '~~', $color);    
         }
-        else {
-            $color = self::$com;
-            $cls = '~CSM';    
-            $string = self::addSlashes($string);
-
-            if (substr($color, 0, 1) == '#') {
-                $color = str_replace('#', '~~', $color);    
-            }
-            if (self::$italic_comment) {
-                $font = ';font-style~italic';    
-            }    
+        if ($font == 'cls') {
+            $font = null;
+            $cls = '~CSM';
+        }
+        elseif ($font == 'clf') {
+            $font = ';~italic';
+            $cls = '~CSM';
         }
         return '~SO'. $color . $font . $cls . $string . '~SC';
     }
+    
+    /*
+    * add slashes to qoute inside comment or
+    * qoute box
+    *
+    * returns string
+    */
+    private static function addSlashes($string)
+    {
+        preg_replace_callback(
+            self::$mcm_arr,
+            function ($matches) use (&$string) {
+                $string = str_replace(
+                            $matches[0],
+                            self::color(addslashes($matches[0]),
+                            self::$com, 'clf'),
+                            $string
+                    );
+            },
+            $string
+        );
+        preg_replace_callback(
+            self::$qot_arr,
+            function ($matches) use (&$string) {
+                $string = str_replace(
+                            $matches[0],
+                            self::color(str_replace(
+                                    array('/', '#'),
+                                    array('~~/', '~~#'),
+                                    $matches[0]),
+                                    self::$qot, 'cls'),
+                            $string
+                    );
+            },
+            $string
+        );
+        preg_replace_callback(
+            self::$com_arr,
+            function ($matches) use (&$string) {
+                $string = str_replace(
+                            $matches[0],
+                            self::color(addslashes($matches[0]),
+                            self::$com, 'clf'),
+                            $string
+                    );
+            },
+            $string
+        );
+        return $string;
+    }
+    
     /*
     * Perform a regular expression search and replace
     *
@@ -140,17 +167,9 @@ class CodeHighlight extends Regex
     * @param The string or an array with strings to 
     * search and replace
     */
-    private static function PR($pattern, $callrepl, $subject = null)
+    private static function PR($pattern, $callrepl, $subject)
     {
-        if ($subject) {
-            return preg_replace($pattern, $callrepl, $subject);
-        }
-        else {
-            return preg_replace_callback($pattern,
-                                array('self', 'color'),
-                                $callrepl
-                            );
-        }
+        return preg_replace($pattern, $callrepl, $subject);
     }
 
     /*
@@ -177,14 +196,15 @@ class CodeHighlight extends Regex
     {
         $pattern = array('/~SO/', '/color:~~/',
                          '/~SM/', '/~SC/',
-                         '/~CSM/', '/yle~ital/'
+                         '/~CSM/', '/;~italic/',
+                         '!~~/!', '/~~#/'
                         );
                         
         $replacement = array('<span style="color:',
                              'color:#',  ';">', '</span>',
-                             ';" class="stp">', 'yle:ital'
-                        );
-                                      
+                             ';" class="stp">', ';font-style:italic',
+                             '/', '#'
+                        );                          
        $code =  preg_replace($pattern, $replacement, $code);
        return self::stripTags($code);  
     }
@@ -202,20 +222,6 @@ class CodeHighlight extends Regex
         return preg_replace($pathern, "$2", $string);
     }
     
-    
-    /*
-    * searches and strips out any code styling 
-    * inside single line comment block
-    *
-    * returns string
-    * @param string to search
-    */
-    private static function stripinComments($code, $check_back = false)
-    {
-        $code = self::PR(self::$com_arr, $code);
-        return $code;
-    }
-       
     /*
     * searches the entire line and replaces any string
     * with upercase alone
@@ -251,8 +257,6 @@ class CodeHighlight extends Regex
     {
         $replaced = null;
         foreach (preg_split ('/$\R?^/m', $code) as $code_lines) {
-            //var_dump($code_lines);
-            $code_lines = self::stripinComments($code_lines);
             $code_lines = self::MatchConst($code_lines);
 
             $replaced .= $code_lines;
@@ -289,23 +293,19 @@ class CodeHighlight extends Regex
     
     private static function format($code)
     {
-        define('C', 'cls');
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $code = self::addSlashes($code);
-        $code = self::PR(self::$tag_arr, self::color("$0", self::$tag, C), $code);
+        $code = self::PR(self::$tag_arr, self::color("$0", self::$tag, 'cls'), $code);
         $code = self::PR(self::$stm_arr, self::color("$0", self::$stm), $code);
         $code = self::PR(self::$var_arr, self::color("$0", self::$var), $code);
         $code = self::PR(self::$adn_arr, self::color("$0", self::$adn), $code);
         $code = self::PR(self::$cst_arr, self::color("$0", self::$cst), $code);
         $code = self::PR(self::$num_arr, self::color("$0", self::$num), $code);
         $code = self::PR(self::$occ_arr, self::color("$0", self::$occ), $code);
-        
-        $code = self::PR(self::$mcm_arr, $code);
         $code = self::PR(self::$mut_arr, self::color("$0", self::$adn), $code);
         $code = self::PR(self::$bbk_arr, self::color("$0", self::$bbk), $code);
         
         $code = self::isPreDef($code);
-        $code = self::PR(self::$qot_arr, self::color("$0", self::$qot, C), $code);
         $code = self::PR(self::$ocb_arr, self::color("$0", self::$ocb), $code);
         
         return '<pre>' .  self::makeQoute($code) . '<pre>';

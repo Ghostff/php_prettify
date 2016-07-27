@@ -9,12 +9,12 @@ class Regex
     protected static $mut_arr = '/\*/';                         /* comments: //var or #var */
     
     protected static $com_arr = '
-        /http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|#(.*)$/';            /* comments: //var or #var */
+        /http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)$/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     
     protected static $num_arr = '
-        /(?:^|\s*)(?<!SO~~)(\d+)(?=\s|\;|\.|\+|\-|\*|\&|\%|\@|\!|\,|\)|\]|\})/';  /* numbers: 0-9 */
+        /(?:^|\s*)(?<!SO~~|\w)(\d+)(?=\s|\;|\.|\+|\-|\*|\&|\%|\@|\!|\,|\)|\]|\})/';  /* numbers: 0-9 */
                         
     protected static $ocb_arr = '/\(|\)/';                      /* ( and ) */
     
@@ -119,7 +119,8 @@ class Regex
                     '/(?<!\$|\w)break\b/',
                     '/(?<!\$|\w)default\b/',
                     '/(?<!\$|\w)switch\b/',
-                    '/(?<!\$|\w)list\b/'
+                    '/(?<!\$|\w)list\b/',
+					'/(?<!\$|\w)continue\b/'
     );
     
 }
