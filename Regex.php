@@ -2,8 +2,7 @@
 class Regex
 {
     protected static $qot_arr = array(
-                    '/(?<!\\\\)"(.*?)(?<!\\\\)"/s',             /* qoutes: 'var' */
-                    "/(?<!\\\\)'(.*?)(?<!\\\\)'/s"              /* qoutes: "var" */
+                    '/(?<!\\\\)"(.*?)(?<!\\\\)"|(?<!\\\\)\'(.*?)(?<!\\\\)\'/s'             /* qoutes: "var" */
     );
     
     protected static $mut_arr = '/\*/';                         /* comments: //var or #var */

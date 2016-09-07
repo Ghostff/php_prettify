@@ -206,7 +206,7 @@ class CodeHighlight extends Regex
                              '/', '#'
                         );                          
        $code =  preg_replace($pattern, $replacement, $code);
-       return self::stripTags($code);  
+       return $code;  
     }
     
 
@@ -308,7 +308,8 @@ class CodeHighlight extends Regex
         $code = self::isPreDef($code);
         $code = self::PR(self::$ocb_arr, self::color("$0", self::$ocb), $code);
         
-        return '<pre>' .  self::makeQoute($code) . '<pre>';
+        $code =  '<pre>' .  self::makeQoute($code) . '</pre>';
+		return self::stripTags($code);
     }
     
     
