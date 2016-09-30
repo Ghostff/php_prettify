@@ -37,6 +37,8 @@ class CodeHighlight extends Regex
     
     private static $italic_comment = true;
     
+    private static $user_func_highlight = false;
+    
     
     
     /*
@@ -70,8 +72,11 @@ class CodeHighlight extends Regex
         </script>
         ';
         if (self::$allow_esc) {
-            $code = str_replace(array("\'", '\"'), 
-                                array("'", '"'), $code);    
+            $code = str_replace(
+                array("\'", '\"'), 
+                array("'", '"'),
+                $code
+            );    
         }
         return $code;
     }
@@ -112,11 +117,11 @@ class CodeHighlight extends Regex
             self::$mcm_arr,
             function ($matches) use (&$string) {
                 $string = str_replace(
-                            $matches[0],
-                            self::color(addslashes($matches[0]),
-                            self::$com, 'clf'),
-                            $string
-                    );
+                    $matches[0],
+                    self::color(addslashes($matches[0]),
+                    self::$com, 'clf'),
+                    $string
+                );
             },
             $string
         );
@@ -124,14 +129,14 @@ class CodeHighlight extends Regex
             self::$qot_arr,
             function ($matches) use (&$string) {
                 $string = str_replace(
-                            $matches[0],
-                            self::color(str_replace(
-                                    array('/', '#'),
-                                    array('~~/', '~~#'),
-                                    $matches[0]),
-                                    self::$qot, 'cls'),
-                            $string
-                    );
+                    $matches[0],
+                    self::color(str_replace(
+                        array('/', '#'),
+                        array('~~/', '~~#'),
+                        $matches[0]),
+                        self::$qot, 'cls'),
+                    $string
+                );
             },
             $string
         );
@@ -139,11 +144,11 @@ class CodeHighlight extends Regex
             self::$com_arr,
             function ($matches) use (&$string) {
                 $string = str_replace(
-                            $matches[0],
-                            self::color(addslashes($matches[0]),
-                            self::$com, 'clf'),
-                            $string
-                    );
+                    $matches[0],
+                    self::color(addslashes($matches[0]),
+                    self::$com, 'clf'),
+                    $string
+                );
             },
             $string
         );
@@ -194,17 +199,19 @@ class CodeHighlight extends Regex
     */
     private static function makeQoute($code, $strip = true)
     {
-        $pattern = array('/~SO/', '/color:~~/',
-                         '/~SM/', '/~SC/',
-                         '/~CSM/', '/;~italic/',
-                         '!~~/!', '/~~#/'
-                        );
+        $pattern = array(
+            '/~SO/', '/color:~~/',
+             '/~SM/', '/~SC/',
+             '/~CSM/', '/;~italic/',
+             '!~~/!', '/~~#/'
+        );
                         
-        $replacement = array('<span style="color:',
-                             'color:#',  ';">', '</span>',
-                             ';" class="stp">', ';font-style:italic',
-                             '/', '#'
-                        );                          
+        $replacement = array(
+            '<span style="color:',
+             'color:#',  ';">', '</span>',
+             ';" class="stp">', ';font-style:italic',
+             '/', '#'
+        );                          
        $code =  preg_replace($pattern, $replacement, $code);
        return $code;  
     }
@@ -238,9 +245,11 @@ class CodeHighlight extends Regex
                 
                 /* make sure matched constant is not TRUE, FALSE or NULL */
                 if (!in_array($matches[0], array('TRUE', 'FALSE', 'NULL'))) {
-                    $code = str_replace($matches[0], 
-                                self::color($matches[0], self::$con),
-                            $code);
+                    $code = str_replace(
+                        $matches[0], 
+                        self::color($matches[0], self::$con),
+                         $code
+                    );
                 }
             }
         }
@@ -277,14 +286,21 @@ class CodeHighlight extends Regex
                 foreach ($matches[1] as $function) {
                     $function = ltrim($function, '~SC');
                     
-                    if (function_exists($function)) {
-                        
-                        //prevent custom function name highlighting
-                        $pathern =     '/(?<!function~SC )' . $function . '\s*\(/';
-                        $replaced = self::PR($pathern, 
-                                        self::color($function . '(', 
-                                        self::$prd), $replaced
-                                    );    
+                    if (( ! self::$user_func_highlight)
+                    && (method_exists(__CLASS__, $function))
+                    ) {
+                        continue;
+                    }
+                    else {
+                        if (function_exists($function)) {
+                            
+                            //prevent custom function name highlighting
+                            $pathern =     '/(?<!function~SC )' . $function . '\s*\(/';
+                            $replaced = self::PR($pathern, 
+                                self::color($function . '(', 
+                                self::$prd), $replaced
+                            );    
+                        }
                     }
                 }
         }
@@ -309,7 +325,7 @@ class CodeHighlight extends Regex
         $code = self::PR(self::$ocb_arr, self::color("$0", self::$ocb), $code);
         
         $code =  '<pre>' .  self::makeQoute($code) . '</pre>';
-		return self::stripTags($code);
+        return self::stripTags($code);
     }
     
     

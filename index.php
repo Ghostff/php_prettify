@@ -1,6 +1,6 @@
 <?php
 
-require 'CodeHighlight.php';
+require 'src/CodeHighlight.php';
 
 /*
 
