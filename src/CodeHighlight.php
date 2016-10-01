@@ -100,7 +100,7 @@ class CodeHighlight extends Regex
         }
         elseif ($font == 'clf') {
             $font = ';~italic';
-            $cls = '~CSM';
+            $cls = '~CKM_T';
         }
         return '~SO'. $color . $font . $cls . $string . '~SC';
     }
@@ -200,18 +200,29 @@ class CodeHighlight extends Regex
     private static function makeQoute($code, $strip = true)
     {
         $pattern = array(
-            '/~SO/', '/color:~~/',
-             '/~SM/', '/~SC/',
-             '/~CSM/', '/;~italic/',
-             '!~~/!', '/~~#/'
+            '/~SO/',
+            '/color:~~/',
+             '/~SM/',
+            '/~SC/',
+             '/~CSM/',
+            '/~CKM_T/',
+            '/;~italic/',
+             '!~~/!',
+            '/~~#/'
         );
                         
         $replacement = array(
             '<span style="color:',
-             'color:#',  ';">', '</span>',
-             ';" class="stp">', ';font-style:italic',
-             '/', '#'
-        );                          
+             'color:#',
+             ';">',
+             '</span>',
+             ';" class="stp">',
+             ';" class="stp comment">',
+             ';font-style:italic',
+             '/',
+             '#'
+        );
+                                 
        $code =  preg_replace($pattern, $replacement, $code);
        return $code;  
     }
