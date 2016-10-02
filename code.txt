@@ -32,6 +32,5 @@ class ClassTest
             $functions_list[] = 'function ' . $func . ' ( ' . implode(', ', $args) . ' )' . PHP_EOL;
         }
         print_r($functions_list);
-		render();
     }
 }

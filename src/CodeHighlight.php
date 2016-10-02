@@ -276,44 +276,49 @@ class CodeHighlight extends Regex
     private static function isPreDef($code)
     {
         $replaced = null;
-        foreach (preg_split ('/$\R?^/m', $code) as $code_lines) {
-            $code_lines = self::MatchConst($code_lines);
+        $lines = preg_split('/\n/', $code);
+        array_pop($lines);
 
-            $replaced .= $code_lines;
+        foreach ($lines as $code_lines) {
+            $code_lines = self::MatchConst($code_lines);
+            
+            $replaced .= $code_lines . "\n";
             preg_match_all("/([\w]+)(\s*)\(/", $code_lines, $matches);
-                /*
-                *
-                * lets sort arrays by string lenght to prevent function like
-                * time overiding function like strtotime.
-                *
-                * we wonna make sure it goes from function with more character
-                * to function functions with less characters
-                *
-                */
-                usort($matches[1], function($match, $with){
-                    return strlen($with) - strlen($match);
-                });
+            /*
+            *
+            * lets sort arrays by string lenght to prevent function like
+            * time overiding function like strtotime.
+            *
+            * we wonna make sure it goes from function with more character
+            * to function functions with less characters
+            *
+            */
+            usort($matches[1], function($match, $with){
+                return strlen($with) - strlen($match);
+            });
+            
+            foreach ($matches[1] as $function) {
+                $function = ltrim($function, '~SC');
                 
-                foreach ($matches[1] as $function) {
-                    $function = ltrim($function, '~SC');
-                    
-                    if (( ! self::$user_func_highlight)
-                    && (method_exists(__CLASS__, $function))
-                    ) {
-                        continue;
-                    }
-                    else {
-                        if (function_exists($function)) {
-                            
-                            //prevent custom function name highlighting
-                            $pathern =     '/(?<!function~SC )' . $function . '\s*\(/';
-                            $replaced = self::PR($pathern, 
-                                self::color($function . '(', 
-                                self::$prd), $replaced
-                            );    
-                        }
+                if (( ! self::$user_func_highlight)
+                && (method_exists(__CLASS__, $function))
+                ) {
+                    continue;
+                }
+                else {
+                    if (function_exists($function)) {
+                        
+                        //prevent custom function name highlighting
+                        $pathern =     '/(?<!function~SC )' . $function . '\s*\(/';
+                        $replaced = self::PR(
+                            $pathern, 
+                            self::color($function . '(', 
+                            self::$prd),
+                            $replaced
+                        );    
                     }
                 }
+            }
         }
         return $replaced;
     }
