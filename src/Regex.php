@@ -119,6 +119,7 @@ class Regex
                     '/(?<!\$|\w)default\b/',
                     '/(?<!\$|\w)switch\b/',
                     '/(?<!\$|\w)list\b/',
+					'/(?<!\$|\w)goto\b/',
 					'/(?<!\$|\w)continue\b/'
     );
     
