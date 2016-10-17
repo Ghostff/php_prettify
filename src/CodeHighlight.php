@@ -34,9 +34,14 @@ class CodeHighlight extends Regex
     private static $allow_esc = true;
     
     private static $add_slashes = true;
-    
+	
+	/*
+	* make all comments italic
+	*/
     private static $italic_comment = true;
-    
+    /*
+	* prevents user defined function from being highlighted
+	*/
     private static $user_func_highlight = false;
     
     
@@ -62,21 +67,15 @@ class CodeHighlight extends Regex
     */
     private static function stripTags($code)
     {
-        $code .= '
-        <script>
+        $code .= '<script>
             var p = document.getElementsByClassName(\"stp\");
             for(i = 0; i < p.length; i++) {
                 p[i].innerHTML = 
                 p[i].innerHTML.replace(/<(?!br\s*\/?)[^>]+>/g, \"\");
             }
-        </script>
-        ';
+        </script>';
         if (self::$allow_esc) {
-            $code = str_replace(
-                array("\'", '\"'), 
-                array("'", '"'),
-                $code
-            );    
+            $code = str_replace(array("\'", '\"'), array("'", '"'), $code);    
         }
         return $code;
     }
@@ -184,14 +183,10 @@ class CodeHighlight extends Regex
     *
     * we gonna find a way to replace the 
     * tags that matches and thus creating an unreausabel
-    * string
+    * string (or reserved keys)
     *
-    * case 1 ~SO
-    * case 2 ~SM
-    * case 3 ~SC
-    * case 4 ~CSM
-    * case 5 yle~ital
-    * case 6 color:~~
+	* all $pattern array element are reserved keyword 
+	* and might course problem if passed as a code
     *
     * returns string
     * @param unreplaced string
@@ -229,7 +224,7 @@ class CodeHighlight extends Regex
     
 
     /*
-    * strips the custom tage we made at self::color
+    * strips the custom tag we made at self::color
     *
     * returns string
     * @param string to striped
@@ -255,7 +250,7 @@ class CodeHighlight extends Regex
             if (preg_match('/^[A-Z_]+$/', ltrim(trim($new_cn), 'const '), $matches)) {
                 
                 /* make sure matched constant is not TRUE, FALSE or NULL */
-                if (!in_array($matches[0], array('TRUE', 'FALSE', 'NULL'))) {
+                if ( ! in_array($matches[0], array('TRUE', 'FALSE', 'NULL'))) {
                     $code = str_replace(
                         $matches[0], 
                         self::color($matches[0], self::$con),
@@ -277,8 +272,7 @@ class CodeHighlight extends Regex
     {
         $replaced = null;
         $lines = preg_split('/\n/', $code);
-        array_pop($lines);
-
+		
         foreach ($lines as $code_lines) {
             $code_lines = self::MatchConst($code_lines);
             
@@ -290,7 +284,7 @@ class CodeHighlight extends Regex
             * time overiding function like strtotime.
             *
             * we wonna make sure it goes from function with more character
-            * to function functions with less characters
+            * to functions with less characters
             *
             */
             usort($matches[1], function($match, $with){
@@ -300,14 +294,11 @@ class CodeHighlight extends Regex
             foreach ($matches[1] as $function) {
                 $function = ltrim($function, '~SC');
                 
-                if (( ! self::$user_func_highlight)
-                && (method_exists(__CLASS__, $function))
-                ) {
+                if (( ! self::$user_func_highlight) && (method_exists(__CLASS__, $function))) {
                     continue;
                 }
                 else {
                     if (function_exists($function)) {
-                        
                         //prevent custom function name highlighting
                         $pathern =     '/(?<!function~SC )' . $function . '\s*\(/';
                         $replaced = self::PR(
@@ -346,7 +337,7 @@ class CodeHighlight extends Regex
     
     
     /*
-    * chack if code is a file or a string
+    * check if code is a file or a string
     *
     * returns string
     * @param file name or string of code to be highligted

@@ -8,7 +8,7 @@ class Regex
     protected static $mut_arr = '/\*/';                         /* comments: //var or #var */
     
     protected static $com_arr = '
-        /http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)$/';            /* comments: //var or #var */
+        /http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)?/';            /* comments: //var or #var */
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     
