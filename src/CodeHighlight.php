@@ -32,17 +32,17 @@ class CodeHighlight
     private static $allow_esc = true;
     
     private static $add_slashes = true;
-	
-	protected static $qot_arr = '/"(.*?)"|\'(.*?)\'/s';
+    
+    protected static $qot_arr = '/"(.*?)"|\'(.*?)\'/s';
     
     protected static $mut_arr = '/\*/'; 
     
     protected static $com_arr = '/http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)?/';
-	
+    
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
     protected static $num_arr = '/(?:^|\s*)(?<!SO~~|\w)(\d+)(?=\s|\;|\.|\+|\-|\*|\&|\%|\@|\!|\,|\)|\]|\})/';  /* numbers: 0-9 */ 
-	                    
+                        
     protected static $ocb_arr = '/\(|\)/';                      /* ( and ) */
     
     protected static $occ_arr = '/\{|\}/';                      /* { and } */
@@ -51,36 +51,36 @@ class CodeHighlight
     
     protected static $var_arr = '/\$[a-zA-Z_]+[a-zA-Z0-9_]*/';
        
-	protected static $tag_arr = '/&lt;\?php\b|(?<!\b)\?&gt;/';    
-	
+    protected static $tag_arr = '/&lt;\?php\b|(?<!\b)\?&gt;/';    
+    
     protected static $adn_arr = '/\bfunction\b|[\W]null\b|\=|\.|\!|\+|\%|\-|\:|\@|\||\bor\b|\?|&gt;|&lt;|&amp;|\band\b|\bAND\b/';
     
-	
+    
     protected static $cst_arr = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     
-	
+    
     protected static $stm_arr = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
-		(c(a(llable|se|tch)|l(ass|one)|on(st|tinue)))|
-		(d(e(clare|fault)|ie|o))|
-		(e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
-		(f(inal|or(each)?))|
-		(g(lobal|oto))|
-		(i(f|mplements|n(clude(_once)?|st(anceof|eadof)|terface)|sset))|
-		(n(amespace|ew))|
-		(p(r(i(nt|vate)|otected)|ublic))|
-		(re(quire(_once)?|turn))|
-		(s(tatic|witch))|
-		(t(hrow|r(ait|y)))|
-		(u(nset(?!\s*\))|se))|
-		(__halt_compiler|break|list|(x)?or|var|while))\b/';
-	
-	/*
-	* make all comments italic
-	*/
+        (c(a(llable|se|tch)|l(ass|one)|on(st|tinue)))|
+        (d(e(clare|fault)|ie|o))|
+        (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
+        (f(inal|or(each)?))|
+        (g(lobal|oto))|
+        (i(f|mplements|n(clude(_once)?|st(anceof|eadof)|terface)|sset))|
+        (n(amespace|ew))|
+        (p(r(i(nt|vate)|otected)|ublic))|
+        (re(quire(_once)?|turn))|
+        (s(tatic|witch))|
+        (t(hrow|r(ait|y)))|
+        (u(nset(?!\s*\))|se))|
+        (__halt_compiler|break|list|(x)?or|var|while))\b/';
+    
+    /*
+    * make all comments italic
+    */
     private static $italic_comment = true;
     /*
-	* prevents user defined function from being highlighted
-	*/
+    * prevents user defined function from being highlighted
+    */
     private static $user_func_highlight = false;
     
     
@@ -212,7 +212,7 @@ class CodeHighlight
     */
     private static function PR($pattern, $callrepl, $subject)
     {
-		$pattern = trim(preg_replace('/\s\s+/', '', $pattern));
+        $pattern = trim(preg_replace('/\s\s+/', '', $pattern));
         return preg_replace($pattern, $callrepl, $subject);
     }
 
@@ -225,8 +225,8 @@ class CodeHighlight
     * tags that matches and thus creating an unreausabel
     * string (or reserved keys)
     *
-	* all $pattern array element are reserved keyword 
-	* and might course problem if passed as a code
+    * all $pattern array element are reserved keyword 
+    * and might course problem if passed as a code
     *
     * returns string
     * @param unreplaced string
@@ -312,7 +312,7 @@ class CodeHighlight
     {
         $replaced = null;
         $lines = preg_split('/\n/', $code);
-		
+        
         foreach ($lines as $code_lines) {
             $code_lines = self::MatchConst($code_lines);
             
