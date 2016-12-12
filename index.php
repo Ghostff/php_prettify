@@ -11,7 +11,7 @@ CodeHighlight::set('stm', '#48d5f0');            // general (if, else, class, pr
 CodeHighlight::set('tag', '#f200fb');            // for php open and close tage (<?php ..)
 CodeHighlight::set('qot', '#96d668');            // for qoutes ("..." or  '...')
 CodeHighlight::set('var', '#e89c51');            // for defined variable ($var_name) ...
-CodeHighlight::set('prd', '#fd1344');            // for php function (eval, strstr) ...    
+CodeHighlight::set('prd', '#fd1344');            // for php function (eval, strstr) ...
 CodeHighlight::set('adn', '#c66cad');            // for php allowes special chars (=, -, +) ...
 CodeHighlight::set('com', '#969595');            // for comments
 CodeHighlight::set('con', '#e06c75');            // for constants A-Z_ alone
@@ -30,7 +30,7 @@ CodeHighlight::set('italic_comment', true);      // makes all comment font style
 *
 * if passing as a file remember to replace all (') with (\')
 * eg (she's home) with (she\'s home). If neglected it might comment out
-* most of your codes. 
+* most of your codes.
 *
 * With the 'allow_esc' on it will output
 *  (she's home) and if off it will output (she\'s home)

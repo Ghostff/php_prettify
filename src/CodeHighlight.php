@@ -1,8 +1,6 @@
 <?php
 
-require 'Regex.php';
-
-class CodeHighlight extends Regex
+class CodeHighlight
 {
     
     private static $stm = '#008000';
@@ -34,6 +32,47 @@ class CodeHighlight extends Regex
     private static $allow_esc = true;
     
     private static $add_slashes = true;
+	
+	protected static $qot_arr = '/"(.*?)"|\'(.*?)\'/s';
+    
+    protected static $mut_arr = '/\*/'; 
+    
+    protected static $com_arr = '/http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)?/';
+	
+    protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
+
+    protected static $num_arr = '/(?:^|\s*)(?<!SO~~|\w)(\d+)(?=\s|\;|\.|\+|\-|\*|\&|\%|\@|\!|\,|\)|\]|\})/';  /* numbers: 0-9 */ 
+	                    
+    protected static $ocb_arr = '/\(|\)/';                      /* ( and ) */
+    
+    protected static $occ_arr = '/\{|\}/';                      /* { and } */
+    
+    protected static $bbk_arr = '/\[|\]/';                      /* { and } */
+    
+    protected static $var_arr = '/\$[a-zA-Z_]+[a-zA-Z0-9_]*/';
+       
+	protected static $tag_arr = '/&lt;\?php\b|(?<!\b)\?&gt;/';    
+	
+    protected static $adn_arr = '/\bfunction\b|[\W]null\b|\=|\.|\!|\+|\%|\-|\:|\@|\||\bor\b|\?|&gt;|&lt;|&amp;|\band\b|\bAND\b/';
+    
+	
+    protected static $cst_arr = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
+    
+	
+    protected static $stm_arr = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
+		(c(a(llable|se|tch)|l(ass|one)|on(st|tinue)))|
+		(d(e(clare|fault)|ie|o))|
+		(e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
+		(f(inal|or(each)?))|
+		(g(lobal|oto))|
+		(i(f|mplements|n(clude(_once)?|st(anceof|eadof)|terface)|sset))|
+		(n(amespace|ew))|
+		(p(r(i(nt|vate)|otected)|ublic))|
+		(re(quire(_once)?|turn))|
+		(s(tatic|witch))|
+		(t(hrow|r(ait|y)))|
+		(u(nset(?!\s*\))|se))|
+		(__halt_compiler|break|list|(x)?or|var|while))\b/';
 	
 	/*
 	* make all comments italic
@@ -173,6 +212,10 @@ class CodeHighlight extends Regex
     */
     private static function PR($pattern, $callrepl, $subject)
     {
+		if (is_string($pattern))
+		{
+			$pattern = trim(preg_replace('/\s\s+/', '', $pattern));
+		}
         return preg_replace($pattern, $callrepl, $subject);
     }
 
