@@ -212,10 +212,7 @@ class CodeHighlight
     */
     private static function PR($pattern, $callrepl, $subject)
     {
-		if (is_string($pattern))
-		{
-			$pattern = trim(preg_replace('/\s\s+/', '', $pattern));
-		}
+		$pattern = trim(preg_replace('/\s\s+/', '', $pattern));
         return preg_replace($pattern, $callrepl, $subject);
     }
 
