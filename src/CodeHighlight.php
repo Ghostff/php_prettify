@@ -37,7 +37,7 @@ class CodeHighlight
     
     protected static $mut_arr = '/\*/'; 
     
-    protected static $com_arr = '/http(s?)~SO~~[a-zA-Z0-9]+~SM:~SC\/\/(*SKIP)(*F)|\/\/(.*)?|(?<!~~)#(.*)?/';
+    protected static $com_arr = '/\/\/(.*)?|(?<!~~)#(.*)?/';
     
     protected static $mcm_arr = '/\/\*(.*?)\*\//s';             /* multy line comments: var  */
 
@@ -163,6 +163,7 @@ class CodeHighlight
             },
             $string
         );
+		
         preg_replace_callback(
             self::$qot_arr,
             function ($matches) use (&$string) {
@@ -178,6 +179,7 @@ class CodeHighlight
             },
             $string
         );
+		
         preg_replace_callback(
             self::$com_arr,
             function ($matches) use (&$string) {
@@ -189,7 +191,9 @@ class CodeHighlight
                 );
             },
             $string
+			
         );
+		
         return $string;
     }
     
@@ -317,7 +321,7 @@ class CodeHighlight
             $code_lines = self::MatchConst($code_lines);
             
             $replaced .= $code_lines . "\n";
-            preg_match_all("/([\w]+)(\s*)\(/", $code_lines, $matches);
+            preg_match_all("/[^SM&gt;~SC|SM:~SC]([\w]+)(\s*)\(/", $code_lines, $matches);
             /*
             *
             * lets sort arrays by string lenght to prevent function like
