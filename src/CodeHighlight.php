@@ -114,7 +114,7 @@ class CodeHighlight
             }
         </script>';
         if (self::$allow_esc) {
-            $code = str_replace(array("\'", '\"'), array("'", '"'), $code);    
+            $code = str_replace(array("\'", '\"'), array("'", '"'), $code);
         }
         return $code;
     }
