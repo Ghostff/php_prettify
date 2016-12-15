@@ -1,12 +1,5 @@
-
-<style>
-.function{
-	font-weight:600;
-}
-</style>
 <?php
 
-require 'src/CodeHighlight.php';
 require 'src/Highlight.php';
 
 /*
@@ -33,28 +26,5 @@ CodeHighlight::set('italic_comment', true);      // makes all comment font style
 
 */
 
-/*
- *
- *
- * <.*?>(\&lt;)<.*?><.*?>(\?)<.*?>(php)|
-        (<.*?>(\&lt;)+<.*><.*?>(\?)+<.*?>)+([(<.*>)+(=)(<.*>)+]|[php]+)
-        (<.*>(&lt;)<\/span><span style="color:#0000FF".*>(\?)<.*>)+([<.*?>(=)<.*>]|[php]+)
-        (<span.*>(\&lt;)<\/span><span .*>(\?)<\/span)+([<.*>(=)<.*>]|[php]+)
-*
-* if passing as a file remember to replace all (') with (\')
-* eg (she's home) with (she\'s home). If neglected it might comment out
-* most of your codes.
-*
-* With the 'allow_esc' on it will output
-*  (she's home) and if off it will output (she\'s home)
-*
-*/
-$start_time = microtime(TRUE);
 
 echo Highlight::render('code.txt', true);
-
-
-
-//echo Highlight::render('code.txt', true);
-
-echo microtime(TRUE) - $start_time;
