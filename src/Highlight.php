@@ -31,9 +31,9 @@ class Highlight
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $quote_ptrn = '/([style=|class=]*)".*?"|\'.*?\'/';
+    private static $quote_ptrn = '/(?<!(style|class)=)"(?!\sclass=|>).*?(?<!(style|class)=)"(?!\sclass=|>)|\'.*?\'/';
     private static $number_ptrn = '/\b(\d+)\b/';
-    private static $comment_ptrn = '/(?<!https:|http:)\/\/.*|(?<!color:)#.*/';
+    private static $comment_ptrn = '/(?<!(http(s):))\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!\#)([A-Z_]+)(?!<\/\w+>\()\b/';
@@ -178,8 +178,10 @@ class Highlight
      */
     private static function isQuote($code)
     {
+		var_dump($code);
         return preg_replace_callback(self::$quote_ptrn, function($args)
         {
+			var_dump($args);
             if ( ! isset($args[1]) || ! in_array($args[1], array('class=', 'style='))) {
                 return self::span(self::$quote, 'strip quote', $args[0]);
             }
@@ -260,6 +262,7 @@ class Highlight
 				self::span(self::$tag_close, 'tag clode', '?>')
 			);
 			$new_code .= self::PR($pattern, $replacement, $new_line);
+			var_dump($new_line);
 			
         }
         $new_code = self::PR(self::$multi_line_comment_ptrn, self::span(self::$multi_line_comment, 'strip multi_line_comment'), $new_code);
