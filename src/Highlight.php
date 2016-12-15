@@ -34,10 +34,10 @@ class Highlight
     private static $quote_ptrn = '/([style=|class=]*)".*?"|\'.*?\'/';
     private static $number_ptrn = '/\b(\d+)\b/';
     private static $comment_ptrn = '/\/\/(.*)?|(?<!color:)#(.*)?/';
-    private static $variable_ptrn = '/\$[a-zA-Z_]+[a-zA-Z0-9_]*/';
+    private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
     private static $constant_ptrn = '/\b([A-Z_]+)\b/';
-    private static $tag_open_ptrn = '/d/';
+    private static $tag_open_ptrn = '/<.*>(&lt;)<.*><.*>(\?)<.*>(php)/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
         (c(a(llable|se|tch)|l(ass(?!=)|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
@@ -57,7 +57,7 @@ class Highlight
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $curly_braces_ptrn = '/\{|\}/';
     private static $square_bracket_ptrn = '/\[|\]/';
-    protected static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//s';
+    private static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//s';
 
 
 
@@ -220,11 +220,7 @@ class Highlight
             $new_line = self::PR(self::$self_ptrn, self::span(self::$self, 'self'), $new_line);
             $new_line = self::PR(self::$bool_ptrn, self::span(self::$bool, 'bool'), $new_line);
 
-            var_dump($new_line);
-            preg_match(self::$tag_open_ptrn, $new_line, $matched);
-            var_dump($matched);
-
-            $new_line = self::PR(self::$tag_open_ptrn, self::span(self::$tag_open, 'tag', '$2$3$4'), $new_line);
+            $new_line = self::PR(self::$tag_open_ptrn, self::span(self::$tag_open, 'tag', '$1$2$4'), $new_line);
             $new_line = self::PR(self::$tag_close_ptrn, self::span(self::$tag_close, 'tag', '$1$2'), $new_line);
             $new_code .= $new_line;
         }

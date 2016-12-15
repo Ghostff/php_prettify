@@ -43,7 +43,12 @@ CodeHighlight::set('italic_comment', true);      // makes all comment font style
 *  (she's home) and if off it will output (she\'s home)
 *
 */
-echo CodeHighlight::render('code.txt', true);
+$start_time = microtime(TRUE);
+
+echo Highlight::render('code.txt', true);
+
+
 
 //echo Highlight::render('code.txt', true);
 
+echo microtime(TRUE) - $start_time;
