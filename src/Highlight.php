@@ -36,7 +36,7 @@ class Highlight
     private static $comment_ptrn = '/\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
-    private static $constant_ptrn = '/\b([A-Z_]+)(?!<\/\w+>\()\b/';
+    private static $constant_ptrn = '/\b(?<!\#)([A-Z_]+)(?!<\/\w+>\()\b/';
     private static $tag_open_ptrn = '/<.*>(&lt;)<.*><.*>(\?)<.*>(php)/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
         (c(a(llable|se|tch)|l(ass(?!=)|one)|on(st|tinue)))|
@@ -231,7 +231,9 @@ class Highlight
 			$new_line = self::PR($pattern, $replacement, $lines);
 			
 			$new_line = self::isFunction($new_line);
-
+			
+			var_dump($new_line);
+			
 			$pattern = array(
 				self::$constant_ptrn,
 				self::$parenthesis_ptrn,
@@ -255,19 +257,16 @@ class Highlight
 				self::span(self::$self, 'self'),
 				self::span(self::$bool, 'bool'),
 				self::span(self::$comment, 'strip comment'),
-				self::span(self::$tag_open, 'tag long', '<?php'),
-				self::span(self::$tag_open, 'tag short', '<?='),
+				self::span(self::$tag_open, 'tag long', '&lt;?php'),
+				self::span(self::$tag_open, 'tag short', '&lt;?='),
 				self::span(self::$tag_close, 'tag clode', '?>')
 			);
 			$new_code .= self::PR($pattern, $replacement, $new_line);
-			
+			var_dump($new_code);
         }
         $new_code = self::PR(self::$multi_line_comment_ptrn, self::span(self::$multi_line_comment, 'strip multi_line_comment'), $new_code);
+		
         $new_code = self::isQuote($new_code);
-
-
-
-
         return sprintf('<pre>%s</pre>%s', $new_code, self::stripCodes());
     }
 
