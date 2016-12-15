@@ -1,3 +1,9 @@
+
+<style>
+.function{
+	font-weight:600;
+}
+</style>
 <?php
 
 require 'src/CodeHighlight.php';

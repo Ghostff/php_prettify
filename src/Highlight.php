@@ -27,7 +27,7 @@ class Highlight
 
 
 
-    private static $self_ptrn = '/self/';
+    private static $self_ptrn = '/(?<!\$|\w)self/';
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
@@ -36,7 +36,7 @@ class Highlight
     private static $comment_ptrn = '/\/\/(.*)?|(?<!color:)#(.*)?/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
-    private static $constant_ptrn = '/\b([A-Z_]+)\b/';
+    private static $constant_ptrn = '/\b([A-Z_]+)(?!<\/\w+>\()\b/';
     private static $tag_open_ptrn = '/<.*>(&lt;)<.*><.*>(\?)<.*>(php)/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
         (c(a(llable|se|tch)|l(ass(?!=)|one)|on(st|tinue)))|
@@ -129,7 +129,7 @@ class Highlight
      */
     private static function PR($pattern, $replacement, $subject)
     {
-        $pattern = trim(preg_replace('/\s\s+/', '', $pattern));
+        //$pattern = trim(preg_replace('/\s\s+/', '', $pattern));
         return preg_replace($pattern, $replacement, $subject);
     }
 
@@ -199,30 +199,66 @@ class Highlight
      */
     private static function format($code)
     {
+		$code = str_replace(
+			array('<?php', '<?=', '?>'),
+			array('PHP_LONG_TAG_OPEN', 'PHP_SHORT_TAG_OPEN', 'PHP_CLOSE_TAG'), 
+			$code
+		);
+		
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $new_code = null;
+		
         foreach (preg_split('/\n/', $code) as $lines)
         {
-            $new_line = self::PR(self::$operators_ptrn, self::span(self::$operators, 'operators'), $lines);
-            $new_line = self::PR(self::$number_ptrn, self::span(self::$number, 'number'), $new_line);
-            $new_line = self::PR(self::$keywords_ptrn, self::span(self::$keywords, 'keyword'), $new_line);
-            $new_line = self::PR(self::$function_ptrn, self::span(self::$function, 'function', '$1'), $new_line);
-            $new_line = self::PR(self::$variable_ptrn, self::span(self::$variable, 'variable'), $new_line);
-            $new_line = self::PR(self::$cast_ptrn, self::span(self::$cast, 'cast'), $new_line);
-            $new_line = self::isFunction($new_line);
+			$pattern = array(
+				self::$operators_ptrn,
+				self::$number_ptrn,
+				trim(preg_replace('/\s\s+/', '', self::$keywords_ptrn)),
+				self::$function_ptrn,
+				self::$variable_ptrn,
+				self::$cast_ptrn
+			);
+			
+			$replacement = array(
+				self::span(self::$operators, 'operators'),
+				self::span(self::$number, 'number'),
+				self::span(self::$keywords, 'keyword'),
+				self::span(self::$function, 'function', '$1'),
+				self::span(self::$variable, 'variable'),
+				self::span(self::$cast, 'cast')
+			);
+			
+			$new_line = self::PR($pattern, $replacement, $lines);
+			
+			$new_line = self::isFunction($new_line);
 
-            $new_line = self::PR(self::$parenthesis_ptrn, self::span(self::$parenthesis, 'parenthesis'), $new_line);
-            $new_line = self::PR(self::$curly_braces_ptrn, self::span(self::$curly_braces, 'curly_braces'), $new_line);
-            $new_line = self::PR(self::$square_bracket_ptrn, self::span(self::$square_bracket, 'square_bracket'), $new_line);
-            $new_line = self::PR(self::$null_ptrn, self::span(self::$null, 'null'), $new_line);
-            $new_line = self::PR(self::$constant_ptrn, self::span(self::$constant, 'constant'), $new_line);
-            $new_line = self::PR(self::$comment_ptrn, self::span(self::$comment, 'strip comment'), $new_line);
-            $new_line = self::PR(self::$self_ptrn, self::span(self::$self, 'self'), $new_line);
-            $new_line = self::PR(self::$bool_ptrn, self::span(self::$bool, 'bool'), $new_line);
-
-            $new_line = self::PR(self::$tag_open_ptrn, self::span(self::$tag_open, 'tag', '$1$2$4'), $new_line);
-            $new_line = self::PR(self::$tag_close_ptrn, self::span(self::$tag_close, 'tag', '$1$2'), $new_line);
-            $new_code .= $new_line;
+			$pattern = array(
+				self::$constant_ptrn,
+				self::$parenthesis_ptrn,
+				self::$curly_braces_ptrn,
+				self::$square_bracket_ptrn,
+				self::$null_ptrn,
+				self::$self_ptrn,
+				self::$bool_ptrn,
+				'/PHP_LONG_TAG_OPEN/',
+				'/PHP_SHORT_TAG_OPEN/',
+				'/PHP_CLOSE_TAG/'
+			);
+			
+			$replacement = array(
+				self::span(self::$constant, 'constant'),
+				self::span(self::$parenthesis, 'parenthesis'),
+				self::span(self::$curly_braces, 'curly_braces'),
+				self::span(self::$square_bracket, 'square_bracket'),
+				self::span(self::$null, 'null'),
+				self::span(self::$self, 'self'),
+				self::span(self::$bool, 'bool'),
+				self::span(self::$tag_open, 'tag long', '<?php'),
+				self::span(self::$tag_open, 'tag short', '<?='),
+				self::span(self::$tag_close, 'tag clode', '?>')
+			);
+			$new_code .= self::PR($pattern, $replacement, $new_line);
+			
         }
         $new_code = self::PR(self::$multi_line_comment_ptrn, self::span(self::$multi_line_comment, 'strip multi_line_comment'), $new_code);
         $new_code = self::isQuote($new_code);
