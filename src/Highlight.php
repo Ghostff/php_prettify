@@ -169,30 +169,6 @@ class Highlight
             } </script>';
     }
 
-
-    /**
-     * checks and highlight codes inside a quote
-     *
-     * @param $code
-     * @return string
-     */
-    private static function isQuote($code)
-    {
-		var_dump($code);
-        return preg_replace_callback(self::$quote_ptrn, function($args)
-        {
-			var_dump($args);
-            if ( ! isset($args[1]) || ! in_array($args[1], array('class=', 'style='))) {
-                return self::span(self::$quote, 'strip quote', $args[0]);
-            }
-            else{
-                return $args[0];
-            }
-        }, $code);
-
-    }
-
-
     /**
      * highlights code
      *
@@ -262,12 +238,20 @@ class Highlight
 				self::span(self::$tag_close, 'tag clode', '?>')
 			);
 			$new_code .= self::PR($pattern, $replacement, $new_line);
-			var_dump($new_line);
-			
         }
-        $new_code = self::PR(self::$multi_line_comment_ptrn, self::span(self::$multi_line_comment, 'strip multi_line_comment'), $new_code);
 		
-        $new_code = self::isQuote($new_code);
+		$pattern = array(
+			self::$multi_line_comment_ptrn,
+			self::$quote_ptrn
+		);
+		
+		$replacement = array(
+			self::span(self::$multi_line_comment, 'strip multi_line_comment'),
+			self::span(self::$quote, 'strip quote')
+		);
+		
+        $new_code = self::PR($pattern, $replacement, $new_code);
+		
         return sprintf('<pre>%s</pre>%s', $new_code, self::stripCodes());
     }
 
