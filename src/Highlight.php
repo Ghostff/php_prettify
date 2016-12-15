@@ -33,7 +33,7 @@ class Highlight
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
     private static $quote_ptrn = '/([style=|class=]*)".*?"|\'.*?\'/';
     private static $number_ptrn = '/\b(\d+)\b/';
-    private static $comment_ptrn = '/\/\/.*|(?<!color:)#.*/';
+    private static $comment_ptrn = '/(?<!https:|http:)\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!\#)([A-Z_]+)(?!<\/\w+>\()\b/';
@@ -53,7 +53,7 @@ class Highlight
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
     private static $tag_close_ptrn = '/<.*>(\?)<.*><.*>(\&gt;)<.*>/';
-    private static $operators_ptrn = '/(\=|\.|\!|\+|\%|\-|\:|\@|\||\?|&gt;|&lt;|&amp;)/';
+    private static $operators_ptrn = '/(\=|\.|\!|\+|\%|\-|(?<!https|http)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $curly_braces_ptrn = '/\{|\}/';
     private static $square_bracket_ptrn = '/\[|\]/';
