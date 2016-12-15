@@ -37,7 +37,6 @@ class Highlight
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!\#)([A-Z_]+)(?!<\/\w+>\()\b/';
-    private static $tag_open_ptrn = '/<.*>(&lt;)<.*><.*>(\?)<.*>(php)/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray(?!\s*\))|s))|
         (c(a(llable|se|tch)|l(ass(?!=)|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
