@@ -3,10 +3,14 @@
 require 'src/Highlight.php';
 
 
-
+/*
 //SETTING FOR DARK THEME
 
 echo '<body style="background:#282c34;color:#FFFFFF">';
+
+
+YOU CAN DO THIS:
+
 Highlight::set('cast', 'C71FC1');
 Highlight::set('null', 'FFFFFF');
 Highlight::set('bool', '1591D7');
@@ -29,7 +33,26 @@ Highlight::set('custom_function', 'FFC13B');
 Highlight::set('multi_line_comment', 'B7B7B7');
 
 
+OR
+
+$properties = array(
+	'cast', 'null', 'bool', 'self', 'quote',
+	'number', 'comment', 'tag_open', 'keywords', 'function',
+	'variable', 'constant', 'tag_close', 'operators', 'parenthesis',
+	'php_function', 'curly_braces', 'square_bracket', 'custom_function', 'multi_line_comment',
+);
+
+$repacement = array(
+	'C71FC1', 'FFFFFF', '1591D7', '88B7FF', '68F06F', 
+	'FF4F51', 'B7B7B7', 'EF62FC', '88B7FF', '88B7FF', 
+	'DB97E4', 'FFFFFF', 'EF62FC', 'FFFFFF', 'FFFFFF', 
+	'FDD28A', 'FFFFFF', 'FFFFFF', 'FFC13B', 'B7B7B7'
+);
+Highlight::set($properties, $repacement);
+
+BOTH HAVE SAME PROCESSING SPEED
+*/
 
 
 
-echo( Highlight::render('code.txt', true));
+echo Highlight::render('code.txt', true);

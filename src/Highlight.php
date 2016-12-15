@@ -232,8 +232,6 @@ class Highlight
 			
 			$new_line = self::isFunction($new_line);
 			
-			var_dump($new_line);
-			
 			$pattern = array(
 				self::$constant_ptrn,
 				self::$parenthesis_ptrn,
@@ -262,7 +260,7 @@ class Highlight
 				self::span(self::$tag_close, 'tag clode', '?>')
 			);
 			$new_code .= self::PR($pattern, $replacement, $new_line);
-			var_dump($new_code);
+			
         }
         $new_code = self::PR(self::$multi_line_comment_ptrn, self::span(self::$multi_line_comment, 'strip multi_line_comment'), $new_code);
 		
