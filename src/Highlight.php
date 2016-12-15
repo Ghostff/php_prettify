@@ -33,7 +33,7 @@ class Highlight
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
     private static $quote_ptrn = '/([style=|class=]*)".*?"|\'.*?\'/';
     private static $number_ptrn = '/\b(\d+)\b/';
-    private static $comment_ptrn = '/\/\/(.*)?|(?<!color:)#(.*)?/';
+    private static $comment_ptrn = '/\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s)(function)(?=\s)/';
     private static $constant_ptrn = '/\b([A-Z_]+)(?!<\/\w+>\()\b/';
@@ -240,6 +240,7 @@ class Highlight
 				self::$null_ptrn,
 				self::$self_ptrn,
 				self::$bool_ptrn,
+				self::$comment_ptrn,
 				'/PHP_LONG_TAG_OPEN/',
 				'/PHP_SHORT_TAG_OPEN/',
 				'/PHP_CLOSE_TAG/'
@@ -253,6 +254,7 @@ class Highlight
 				self::span(self::$null, 'null'),
 				self::span(self::$self, 'self'),
 				self::span(self::$bool, 'bool'),
+				self::span(self::$comment, 'strip comment'),
 				self::span(self::$tag_open, 'tag long', '<?php'),
 				self::span(self::$tag_open, 'tag short', '<?='),
 				self::span(self::$tag_close, 'tag clode', '?>')

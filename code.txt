@@ -1,1 +1,1 @@
-//prevent custom function name highlighting
+#prevent custom function name highlighting
