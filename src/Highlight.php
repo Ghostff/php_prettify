@@ -28,7 +28,7 @@ class Highlight
 
 
     private static $self_ptrn = '/(?<!\$|\w)self/';
-    private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
+    private static $cast_ptrn = '/((\(|(?<!\$|\w))\s*(int|string|float|array|object|unset|binary|bool)\s*(\)|(?<!;|\w|\()))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
     private static $quote_ptrn = '/(?<!(style|class)=)"(?!\sclass=|>).*?(?<!(style|class)=)"(?!\sclass=|>)|\'.*?\'/';
@@ -178,13 +178,13 @@ class Highlight
     {
 		$code = str_replace(
 			array('<?php', '<?=', '?>'),
-			array('PHP_LONG_TAG_OPEN', 'PHP_SHORT_TAG_OPEN', 'PHP_CLOSE_TAG'), 
+			array('PHP_LONG_TAG_OPEN', 'PHP_SHORT_TAG_OPEN', 'PHP_CLOSE_TAG'),
 			$code
 		);
-		
+
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $new_code = null;
-		
+
         foreach (preg_split('/\n/', $code) as $lines)
         {
 			$pattern = array(
@@ -195,7 +195,7 @@ class Highlight
 				self::$variable_ptrn,
 				self::$cast_ptrn
 			);
-			
+
 			$replacement = array(
 				self::span(self::$operators, 'operators'),
 				self::span(self::$number, 'number'),
@@ -204,11 +204,11 @@ class Highlight
 				self::span(self::$variable, 'variable'),
 				self::span(self::$cast, 'cast')
 			);
-			
+
 			$new_line = self::PR($pattern, $replacement, $lines);
-			
+
 			$new_line = self::isFunction($new_line);
-			
+
 			$pattern = array(
 				self::$constant_ptrn,
 				self::$parenthesis_ptrn,
@@ -222,7 +222,7 @@ class Highlight
 				'/PHP_SHORT_TAG_OPEN/',
 				'/PHP_CLOSE_TAG/'
 			);
-			
+
 			$replacement = array(
 				self::span(self::$constant, 'constant'),
 				self::span(self::$parenthesis, 'parenthesis'),
@@ -238,19 +238,19 @@ class Highlight
 			);
 			$new_code .= self::PR($pattern, $replacement, $new_line);
         }
-		
+
 		$pattern = array(
 			self::$multi_line_comment_ptrn,
 			self::$quote_ptrn
 		);
-		
+
 		$replacement = array(
 			self::span(self::$multi_line_comment, 'strip multi_line_comment'),
 			self::span(self::$quote, 'strip quote')
 		);
-		
+
         $new_code = self::PR($pattern, $replacement, $new_code);
-		
+
         return sprintf('<pre>%s</pre>%s', $new_code, self::stripCodes());
     }
 

@@ -10,7 +10,7 @@
 
 class ClassTest
 {
-    public static function FunctionTest($value = array(), $is_boll = false)
+    public static function FunctionTest(array $value = array(), bool $is_boll = false): string
     {
         $count = 10 + 233;
         self::testMethod();
@@ -35,6 +35,6 @@ class ClassTest
             $functions_list[] = 'function ' . $func . ' ( ' . implode(', ', $args) . ' )' . PHP_EOL;
         }
         print_r($functions_list);
-        self::test("Double Quote Test");
+        return self::test("Double Quote Test");
     }
 }
