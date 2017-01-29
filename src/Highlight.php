@@ -28,7 +28,7 @@ class Highlight
 
 
     private static $self_ptrn = '/(?<!\$|\w)self/';
-    private static $cast_ptrn = '/((\(|(?<!\$|\w))\s*(int|string|float|array|object|unset|binary|bool)\s*(\)|(?<!;|\w|\()))/';
+    private static $cast_ptrn = '/((\(|(?<!\$|\w))\s*int|string|float|array|object|unset|binary|bool\s*(\)|(?<!;|\w|\()))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
     private static $quote_ptrn = '/(?<!(style|class)=)"(?!\sclass=|>).*?(?<!(style|class)=)"(?!\sclass=|>)|\'.*?\'/';
