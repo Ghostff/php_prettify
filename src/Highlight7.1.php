@@ -6,7 +6,6 @@ class Highlight
 {
 	private static $styled = null;
 	private static $cache_path = null;
-	private static $expire = null;
 
     private static $cast = '038C8C';
     private static $null = '0000FF';
@@ -62,14 +61,13 @@ class Highlight
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
     private static $operators_ptrn = '/(\=|\.|\!|\+|\%|\-|(?<!https|http)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
-	private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
+    private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private static $parenthesis_ptrn = '/\(|\)/';
-	private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
+    private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
     private static $curly_braces_ptrn = '/\{|\}/';
-	private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
+    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
     private static $square_bracket_ptrn = '/\[|\]/';
     private static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//';
-
 
 
     /**
@@ -79,13 +77,13 @@ class Highlight
      * @param string $values
      * @return void
      */
-    public static function set($property, $values)
+    public static function set(string $property, string $values): void
     {
         if (property_exists(__CLASS__, $property)) {
-			self::${$property} = $values;
-		} else {
-			throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
-		}
+            self::${$property} = $values;
+        } else {
+            throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
+        }
     }
 
 
@@ -97,21 +95,22 @@ class Highlight
      * @param string $content
      * @return string
      */
-    private static function span($color, $class, $content = '$0')
+    private static function span(string $color, string $class, string $content = '$0'): string
     {
         $span = sprintf('<span style="color:#%s" class="%s">%s</span>', $color, $class, $content);
         return $span;
     }
 
+
     /**
      * adds code to a font tag
      *
-     * @param $color
-     * @param $class
+     * @param string $color
+     * @param string $class
      * @param string $content
      * @return string
      */
-    private static function font($color, $class, $content = '$0')
+    private static function font(string $color, string $class, string $content = '$0'): string
     {
         $font = sprintf('<font style="color:#%s" class="%s">%s</font>', $color, $class, $content);
         return $font;
@@ -120,12 +119,12 @@ class Highlight
     /**
      * php preg replace function
      *
-     * @param string $pattern
-     * @param string $replacement
+     * @param array $pattern
+     * @param array $replacement
      * @param string $subject
-     * @return mixed
+     * @return string
      */
-    private static function PR($pattern, $replacement, $subject)
+    private static function PR(array $pattern, array $replacement, string $subject): string
     {
         return preg_replace($pattern, $replacement, $subject);
     }
@@ -137,7 +136,7 @@ class Highlight
      * @param string $code
      * @return string
      */
-    private static function isFunction($code)
+    private static function isFunction(string $code): string
     {
         return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg)
         {
@@ -151,16 +150,17 @@ class Highlight
         }, $code);
     }
 
+
     /**
-     * formats strings
+     * Highlights strings
      *
-     * @param $code
-     * @param $file_name
-     * @param $cache
-     * @param $tabs_to_space
+     * @param string $code
+     * @param string $file_name
+     * @param bool $cache
+     * @param bool $tabs_to_space
      * @return string
      */
-    private static function format($code, $file_name, $cache , $tabs_to_space)
+    private static function format(string $code, string $file_name, bool $cache , bool $tabs_to_space): string
     {
         $code = str_replace(
             array('<?php', '<?=', '?>', '\\\\'),
@@ -266,13 +266,13 @@ class Highlight
 
 
     /**
-     * caches formatted strings and handles gc
+     * caches formatted strings and handles gc. (currently available for file highlight alone)
      *
-     * @param $name
+     * @param string $name
      * @param string $new_cache
      * @return string
      */
-    private static function cache($name, $new_cache = null)
+    private static function cache(string $name, string $new_cache = null): string
     {
         $file = self::$cache_path . DIRECTORY_SEPARATOR . '_x86';
         if ($new_cache == null)
@@ -293,13 +293,14 @@ class Highlight
             @$content = file_get_contents($file);
             $content = (array) json_decode($content);
             if (( ! isset($content[$name])) || ((isset($content[$name])) && ($content[$name][0] != filemtime($name)))) {
-                $_name =  time() + mt_rand(10, 200);
+                $_name =  time() + mt_rand(1, 500);
                 $content[$name] = array(filemtime($name), $_name);
                 file_put_contents($file, json_encode($content));
                 file_put_contents(self::$cache_path . DIRECTORY_SEPARATOR . $_name, $new_cache);
             }
         }
         return '';
+
     }
 
 
@@ -308,23 +309,23 @@ class Highlight
      *
      * @param string $code
      * @param bool $is_file
+     * @param bool $cache
+     * @param bool $tabs_to_space
      * @return string
      */
-    public static function render($code, $is_file = false, $cache = false, $expire = null, $tabs_to_space = true)
+    public static function render(string $code, bool $is_file = false, bool $cache = true, bool $tabs_to_space = true): string
     {
+        self::$cache_path = __DIR__ . DIRECTORY_SEPARATOR . '.caches';
         if ($is_file) {
-            self::$cache_path = __DIR__ . DIRECTORY_SEPARATOR . '.caches';
-            if ($is_file) {
-                if ($cache) {
-                    $cached = self::cache($code);
-                    if ($cached != '') {
-                        return $cached;
-                    }
+            if ($cache) {
+                $cached = self::cache($code);
+                if ($cached != '') {
+                    return $cached;
                 }
-                return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
             }
+            return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
         }
-        return self::format($code, null, false, true);
+        return self::format($code, '', false, true);
     }
 
 
@@ -335,7 +336,7 @@ class Highlight
      * @param bool $line
      * @param bool $line_number
      */
-    public static function setStyle(array $style, $line = true, $line_number = true)
+    public static function setStyle(array $style, bool $line = true, bool $line_number = true): void
     {
         @$margin = $style['line_number_width'];
         @$padding = $style['line_padding'];

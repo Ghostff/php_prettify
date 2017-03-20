@@ -1,22 +1,19 @@
 # PHP Prettify
 
-Renders your display PHP code into a beautiful colored code. 
-
-
+Outputs or returns html markup for a syntax highlighted version of the given PHP code using the your defined colors. *includes PHP 7.1 version*
 
 1: passing as a file
 ```php
  <?php
-    require 'CodeHighlight.php';
 
     /*
     *
     * @param file name or string of php code
-    * @param use to identify if code is a file(true) or string(false) default: false
-    *
+    * @param specified name is a file flag
+    * @param cache flag (currently work for files only)
+    * @param convert tabs to space flag
     */
-    
-    echo CodeHighlight::render('code.txt', true);
+    echo PhpPrettify\Highlight::render('code.txt', true, true, true);
     
 ```
 ![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/dark.png)
