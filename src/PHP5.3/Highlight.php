@@ -4,9 +4,8 @@ namespace PhpPrettify;
 
 class Highlight
 {
-	private static $styled = null;
-	private static $cache_path = null;
-	private static $expire = null;
+    private static $styled = null;
+    private static $cache_path = null;
 
     private static $cast = '038C8C';
     private static $null = '0000FF';
@@ -23,16 +22,15 @@ class Highlight
     private static $constant = '8C4D03';
     private static $tag_close = 'F00000';
     private static $operators = '0000FF';
-	private static $semi_colon = '000000';
+    private static $semi_colon = '000000';
     private static $parenthesis = '038C8C';
-	private static $return_type = 'E3093F';
+    private static $return_type = 'E3093F';
     private static $php_function = '6367A7';
     private static $curly_braces = '7F5217';
-	private static $parameter_type = 'E3093F';
+    private static $parameter_type = 'E3093F';
     private static $square_bracket = 'F46164';
     private static $custom_function = 'A611AA';
     private static $multi_line_comment = 'FEA500';
-
 
 
     private static $self_ptrn = '/(?<!\$|\w)self/';
@@ -62,14 +60,13 @@ class Highlight
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
     private static $operators_ptrn = '/(\=|\.|\!|\+|\%|\-|(?<!https|http)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
-	private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
+    private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private static $parenthesis_ptrn = '/\(|\)/';
-	private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
+    private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
     private static $curly_braces_ptrn = '/\{|\}/';
-	private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
+    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
     private static $square_bracket_ptrn = '/\[|\]/';
     private static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//';
-
 
 
     /**
@@ -82,10 +79,10 @@ class Highlight
     public static function set($property, $values)
     {
         if (property_exists(__CLASS__, $property)) {
-			self::${$property} = $values;
-		} else {
-			throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
-		}
+            self::${$property} = $values;
+        } else {
+            throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
+        }
     }
 
 
@@ -139,13 +136,11 @@ class Highlight
      */
     private static function isFunction($code)
     {
-        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg)
-        {
+        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg) {
             $func = $arg[1];
             if (function_exists($func)) {
                 return self::span(self::$php_function, 'php_function', $func);
-            }
-            else {
+            } else {
                 return self::span(self::$custom_function, 'custom_function', $func);
             }
         }, $code);
@@ -160,7 +155,7 @@ class Highlight
      * @param $tabs_to_space
      * @return string
      */
-    private static function format($code, $file_name, $cache , $tabs_to_space)
+    private static function format($code, $file_name, $cache, $tabs_to_space)
     {
         $code = str_replace(
             array('<?php', '<?=', '?>', '\\\\'),
@@ -170,8 +165,7 @@ class Highlight
 
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $new_code = null;
-        foreach (preg_split('/\n/', $code)  as $line_number => $lines)
-        {
+        foreach (preg_split('/\n/', $code) as $line_number => $lines) {
             $line_number++;
             $new_code .= '<div class="line_' . $line_number . ' line" label="' . $line_number . '">';
 
@@ -256,7 +250,7 @@ class Highlight
         }
 
         $style = '.strip font,.strip span{color:inherit !important}' . self::$styled;
-        $pretty = '<pre>'. $new_code . '</pre><style>' . $style . '</style>';
+        $pretty = '<pre>' . $new_code . '</pre><style>' . $style . '</style>';
 
         if ($cache) {
             self::cache($file_name, $pretty);
@@ -275,25 +269,22 @@ class Highlight
     private static function cache($name, $new_cache = null)
     {
         $file = self::$cache_path . DIRECTORY_SEPARATOR . '_x86';
-        if ($new_cache == null)
-        {
+        if ($new_cache == null) {
             @$content = file_get_contents($file);
-            $content = (array) json_decode($content);
+            $content = (array)json_decode($content);
 
             if ((isset($content[$name])) && ($content[$name][0] == filemtime($name))) {
                 return file_get_contents(self::$cache_path . DIRECTORY_SEPARATOR . $content[$name][1]);
             }
-        }
-        else
-        {
-            if ( ! is_dir(self::$cache_path)) {
+        } else {
+            if (!is_dir(self::$cache_path)) {
                 mkdir(self::$cache_path);
                 file_put_contents($file, '');
             }
             @$content = file_get_contents($file);
-            $content = (array) json_decode($content);
-            if (( ! isset($content[$name])) || ((isset($content[$name])) && ($content[$name][0] != filemtime($name)))) {
-                $_name =  time() + mt_rand(10, 200);
+            $content = (array)json_decode($content);
+            if ((!isset($content[$name])) || ((isset($content[$name])) && ($content[$name][0] != filemtime($name)))) {
+                $_name = time() + mt_rand(10, 200);
                 $content[$name] = array(filemtime($name), $_name);
                 file_put_contents($file, json_encode($content));
                 file_put_contents(self::$cache_path . DIRECTORY_SEPARATOR . $_name, $new_cache);
@@ -346,7 +337,7 @@ class Highlight
         @$line_border_scale = $style['line_border_scale'];
 
         $styled = '.line{
-		  ' . (($line) ? 'border-bottom: ' . $line_border_scale . 'px solid #' . $line_border . ';' : '') .'
+		  ' . (($line) ? 'border-bottom: ' . $line_border_scale . 'px solid #' . $line_border . ';' : '') . '
 		  margin-left:' . $margin . 'px;
 		  padding:' . $padding . 'px 0;
 		}';
