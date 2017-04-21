@@ -3,13 +3,15 @@
 /*
 *
 * LIGHT VERSION
-* You can list all arguments using 
+* You can list all arguments using
 * ReflectionFunction class
 *
 */
 
+#hey look behind u
 class ClassTest
 {
+    /*hey man*/ddd/*hey man*/dddd
     public static function FunctionTest(array $value = array(), bool $is_boll = false): string
     {
         $count = 10 + 233;
@@ -36,5 +38,19 @@ class ClassTest
         }
         print_r($functions_list);
         return self::test("Double Quote Test");
+
+        $ssq = 'Hey look behind you';
+        $sdq = '
+            Hey
+            look behind
+            you
+        ';
+
+        $ssq = 'Hey look behind you';
+        $mdq = '
+            Hey
+            look behind
+            you
+        ';
     }
 }

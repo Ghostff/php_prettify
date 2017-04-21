@@ -1,6 +1,6 @@
 <?php
 
-require 'src/Highlight.php';
+require 'src/PHP7.0/Highlight.php';
 
 
 /*
@@ -55,4 +55,4 @@ BOTH HAVE SAME PROCESSING SPEED
 
 
 
-echo Highlight::render('code.txt', true);
+echo PhpPrettify\Highlight::render('code.txt', true, false);
