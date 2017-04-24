@@ -1,6 +1,7 @@
 # PHP Prettify
 
-Outputs or returns html markup for a syntax highlighted version of the given PHP code using the your defined colors. *includes PHP 7.1 version*
+Outputs or returns html markup for a syntax highlighted version of the given PHP code using the your defined colors.   
+*includes PHP 7.1 version*
 
 ## Optional methods
 ```php
@@ -22,7 +23,7 @@ Highlight::setHighlight(0, ['class' => 'h-class']); #Add attribute(HTML) to a pa
     * @param (bool) specified name is a file flag
     * @param (bool) allow catching of processed text (currently work for files only)
     */
-    echo '<pre>', Highlight::render('code.txt', true, true) , '</pre>';
+    echo '<pre>', Highlight::render('code.txt', true, true), '</pre>';
     
 ```
 
