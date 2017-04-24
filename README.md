@@ -26,7 +26,6 @@ Highlight::setHighlight(0, ['class' => 'h-class']); #Add attribute(HTML) to a pa
     
 ```
 
-##Dark Output 
+
 ![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/dark.png)   
-##Light output 
 ![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/light.png)
