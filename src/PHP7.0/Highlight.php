@@ -42,8 +42,8 @@ class Highlight
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
     private static $quote_ptrn = '/(?<!\\\)\'(.*?)(?<!\\\)\'|
         (?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>).*?(?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>)/';
-    private static $quote_start_ptrn = '/((?<!\\\)\'(.*)';
-    private static $quote_stop_ptrn = '/(.*)(?<!\\\)\'';
+    private static $quote_start_ptrn = '/(?<!\\\)\'(.*)/';
+    private static $quote_stop_ptrn = '/(?<= class="strip quote"\>)(.*?)(?<!\\\)\'/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
     private static $comment_ptrn = '/(?<!(http(s):))\/\/.*|(?<!color:)#.*/';
@@ -71,8 +71,8 @@ class Highlight
     private static $curly_braces_ptrn = '/[\{|\}]/';
     private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
     private static $square_bracket_ptrn = '/\[|\]/';
-    private static $multi_line_comment_ptrn = '/.*?(\/\*(.*?)\*\/)/';
-    private static $multi_line_comment_stop_ptrn = '/((.*)\*\/).*?/';
+    private static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//';
+    private static $multi_line_comment_stop_ptrn = '/(.*)\*\/(?!\<\/font\>)/';
     private static $multi_line_comment_start_ptrn = '/(?<! class="strip multi_line_comment"\>)\/\*(.*)/';
 
 
@@ -197,11 +197,11 @@ class Highlight
         }
 
         $start_number = self::$start_line_number;
-        $is_multi_line_comment = false;
         $preg_replaced = 0;
+        $is_multi_line_qoute = false;
+        $is_multi_line_comment = false;
         foreach (preg_split('/\n/', $code) as $count => $lines)
         {
-
 
             if ($count < $start_number)
             {
@@ -227,34 +227,66 @@ class Highlight
 
             $new_code .= $gui_highlight . $gui_line_number;
 
-            #preg_replace(self::$quote_ptrn, self::font(self::$quote, 'strip quote'), $lines);
-
-
             $replacement = self::font(self::$multi_line_comment, 'strip multi_line_comment');
             $lines = preg_replace(self::$multi_line_comment_ptrn, $replacement, $lines);
 
-            if ($is_multi_line_comment && preg_match(self::$multi_line_comment_stop_ptrn, $lines, $matches))
+            if ( ! $is_multi_line_comment)
             {
-                $font = self::font(self::$multi_line_comment, 'strip multi_line_comment', $lines);
-                $lines = str_replace($matches[0], $font, $lines);
-                $is_multi_line_comment = false;
+                $replacement = self::font(self::$multi_line_comment, 'strip multi_line_comment');
+                $lines = preg_replace(self::$multi_line_comment_start_ptrn, $replacement, $lines, -1, $preg_replaced);
+                if ($preg_replaced)
+                {
+                    $is_multi_line_comment = true;
+                    $preg_replaced = 0;
+                }
             }
             else
             {
-                if ( ! $is_multi_line_comment)
+                $lines = self::font(self::$multi_line_comment, 'strip multi_line_comment', $lines);
+            }
+
+            if ($is_multi_line_comment)
+            {
+                $lines = preg_replace(self::$multi_line_comment_stop_ptrn, '$0</font>', $lines, -1, $preg_replaced);
+                if ($preg_replaced)
                 {
-                    $replacement = self::font(self::$multi_line_comment, 'strip multi_line_comment', '$1');
-                    $lines = preg_replace(self::$multi_line_comment_start_ptrn, $replacement, $lines, -1, $preg_replaced);
-                    if ($preg_replaced)
-                    {
-                        $is_multi_line_comment = true;
-                    }
-                }
-                else
-                {
-                    $new_code .= self::font(self::$multi_line_comment, 'strip multi_line_comment', $lines);
+                    $is_multi_line_comment = false;
+                    $preg_replaced = 0;
                 }
             }
+
+
+
+            if ( ! $is_multi_line_qoute)
+            {
+                $replacement = self::font(self::$quote, 'strip quote');
+                $lines = preg_replace(self::$quote_start_ptrn, $replacement, $lines, -1, $preg_replaced);
+                if ($preg_replaced)
+                {
+                    $is_multi_line_qoute = true;
+                    $preg_replaced = 0;
+                }
+            }
+            else
+            {
+                $lines = self::font(self::$quote, 'strip quote', $lines);
+            }
+
+            preg_match(self::$quote_stop_ptrn, $lines, $m);
+            new \Dump($m);
+            if ($is_multi_line_qoute)
+            {
+                preg_match(self::$quote_stop_ptrn, $lines, $m);
+                var_dump($lines);
+               # $lines = preg_replace(self::$quote_stop_ptrn, '$0</font>', $lines, -1, $preg_replaced);
+                if ($preg_replaced)
+                {
+                    $is_multi_line_comment = false;
+                    $preg_replaced = 0;
+                }
+                var_dump($lines);
+            }
+
 
             if ( ! $is_multi_line_comment)
             {
@@ -317,11 +349,9 @@ class Highlight
                     self::span(self::$tag_close, 'tag clode', '?>'),
                     '\\\\\\'
                 ];
-                $new_code .= self::PR($pattern, $replacement, $new_line);
 
-            }
 
-            $new_code .= '</td></tr>';
+                $new_code .= $lines . '</td></tr>';
 
         }
 
