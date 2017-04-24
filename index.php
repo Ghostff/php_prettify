@@ -1,6 +1,6 @@
 <?php
 
-require 'src/Highlight.php';
+require 'src/PHP7.0/Highlight.php';
 
 
 /*
@@ -43,9 +43,9 @@ $properties = array(
 );
 
 $repacement = array(
-	'C71FC1', 'FFFFFF', '1591D7', '88B7FF', '68F06F', 
-	'FF4F51', 'B7B7B7', 'EF62FC', '88B7FF', '88B7FF', 
-	'DB97E4', 'FFFFFF', 'EF62FC', 'FFFFFF', 'FFFFFF', 
+	'C71FC1', 'FFFFFF', '1591D7', '88B7FF', '68F06F',
+	'FF4F51', 'B7B7B7', 'EF62FC', '88B7FF', '88B7FF',
+	'DB97E4', 'FFFFFF', 'EF62FC', 'FFFFFF', 'FFFFFF',
 	'FDD28A', 'FFFFFF', 'FFFFFF', 'FFC13B', 'B7B7B7'
 );
 Highlight::set($properties, $repacement);
@@ -54,5 +54,8 @@ BOTH HAVE SAME PROCESSING SPEED
 */
 
 
-
-echo Highlight::render('code.txt', true);
+$m = microtime(1);
+echo '<pre>';
+echo PhpPrettify\Highlight::render('code.txt', true, false);
+echo '</pre>';
+var_dump(microtime(1) - $m);

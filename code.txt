@@ -3,7 +3,7 @@
 /*
 *
 * LIGHT VERSION
-* You can list all arguments using 
+* You can list all arguments using
 * ReflectionFunction class
 *
 */

@@ -4,8 +4,11 @@ namespace PhpPrettify;
 
 class Highlight
 {
-	private static $styled = null;
-	private static $cache_path = null;
+
+    private static $highlight = [];
+    private static $line_number = [];
+    private static $cache_path = null;
+    private static $show_line_number = false;
 
     private static $cast = '038C8C';
     private static $null = '0000FF';
@@ -33,21 +36,19 @@ class Highlight
     private static $multi_line_comment = 'FEA500';
 
 
-
     private static $self_ptrn = '/(?<!\$|\w)self/';
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $quote_ptrn = '/((?<!\\\)\'(.*?)(?<!\\\)\'|
-        (?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>).*?(?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>))/s';
+    private static $quote_ptrn = '/(?<!\\\)\'(.*?)|(?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>)(.*?)/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
-    private static $number_ptrn = '/\b(\d+)\b/';
+    private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
     private static $comment_ptrn = '/(?<!(http(s):))\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s|^)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray\s*(?=\()|s))|
-        (c(a(llable|se|tch)|l(ass(?!=)|one)|on(st|tinue)))|
+        (c(a(llable|se|tch)|l(ass(?!\=")|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
         (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
         (f(inal|or(each)?))|
@@ -60,14 +61,14 @@ class Highlight
         (t(hrow|r(ait|y)))|
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
-    private static $operators_ptrn = '/(\=|\.|\!|\+|\%|\-|(?<!https|http)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
+    private static $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|\-|(?<!https|http| style="color)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
     private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
-    private static $curly_braces_ptrn = '/\{|\}/';
+    private static $curly_braces_ptrn = '/[\{|\}]/';
     private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
     private static $square_bracket_ptrn = '/\[|\]/';
-    private static $multi_line_comment_ptrn = '/\/\*(.*?)\*\//';
+    private static $multi_line_comment_ptrn = '/\/\*|\*\//';
 
 
     /**
@@ -79,54 +80,14 @@ class Highlight
      */
     public static function set(string $property, string $values): void
     {
-        if (property_exists(__CLASS__, $property)) {
+        if (property_exists(__CLASS__, $property))
+        {
             self::${$property} = $values;
-        } else {
-            throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
         }
-    }
-
-
-    /**
-     * adds code to a span tag
-     *
-     * @param string $color
-     * @param string $class
-     * @param string $content
-     * @return string
-     */
-    private static function span(string $color, string $class, string $content = '$0'): string
-    {
-        $span = sprintf('<span style="color:#%s" class="%s">%s</span>', $color, $class, $content);
-        return $span;
-    }
-
-
-    /**
-     * adds code to a font tag
-     *
-     * @param string $color
-     * @param string $class
-     * @param string $content
-     * @return string
-     */
-    private static function font(string $color, string $class, string $content = '$0'): string
-    {
-        $font = sprintf('<font style="color:#%s" class="%s">%s</font>', $color, $class, $content);
-        return $font;
-    }
-
-    /**
-     * php preg replace function
-     *
-     * @param array $pattern
-     * @param array $replacement
-     * @param string $subject
-     * @return string
-     */
-    private static function PR(array $pattern, array $replacement, string $subject): string
-    {
-        return preg_replace($pattern, $replacement, $subject);
+        else
+        {
+            throw new \RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
+        }
     }
 
 
@@ -141,63 +102,199 @@ class Highlight
         return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg)
         {
             $func = $arg[1];
-            if (function_exists($func)) {
-                return self::span(self::$php_function, 'php_function', $func);
+            if (function_exists($func))
+            {
+                return '<span style="color:#' . self::$php_function .'" class="php_function">' . $func . '</span>';
             }
-            else {
-                return self::span(self::$custom_function, 'custom_function', $func);
+            else
+            {
+                return '<span style="color:#' . self::$custom_function .'" class="custom_function">' . $func . '</span>';
             }
         }, $code);
     }
 
+    /**
+     * displays line numbers
+     *
+     * @param bool $switch
+     */
+    public static function showLineNumber(bool $switch)
+    {
+        self::$show_line_number = $switch;
+    }
+
 
     /**
-     * Highlights strings
+     * declares the line at which text processing begin or ends
+     *
+     * @param int $from
+     * @param int $to
+     * @param bool $show_unprocessed
+     */
+    public static function setRange(int $from = 0, int $to = 0, bool $show_unprocessed = false)
+    {
+        self::$line_number['start'] = $from;
+        self::$line_number['end'] = $to;
+        self::$line_number['skip'] = $show_unprocessed;
+    }
+
+    /**
+     * adds html attributes to line table > tr
+     *
+     * @param int $line
+     * @param array $attributes
+     */
+    public static function setHighlight(int $line, array $attributes = [])
+    {
+        self::$highlight['line'] = $line;
+        self::$highlight['attr'] = $attributes;
+    }
+
+
+    /**
+     * processes supplied text
      *
      * @param string $code
      * @param string $file_name
      * @param bool $cache
-     * @param bool $tabs_to_space
      * @return string
      */
-    private static function format(string $code, string $file_name, bool $cache , bool $tabs_to_space): string
+    private static function format(string $code, string $file_name, bool $cache): string
     {
         $code = str_replace(
-            array('<?php', '<?=', '?>', '\\\\'),
-            array('PP_PHP_LONG_TAG_OPEN', 'PP_PHP_SHORT_TAG_OPEN', 'PP_PHP_CLOSE_TAG', 'PP_PHP_DOUBLE_BACK_SLASH'),
+            ['<?php', '<?=', '?>', '\\\\'],
+            ['PP_PHP_LONG_TAG_OPEN', 'PP_PHP_SHORT_TAG_OPEN', 'PP_PHP_CLOSE_TAG', 'PP_PHP_DOUBLE_BACK_SLASH'],
             $code
         );
 
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $new_code = null;
-        foreach (preg_split('/\n/', $code)  as $line_number => $lines)
-        {
-            $line_number++;
-            $new_code .= '<div class="line_' . $line_number . ' line" label="' . $line_number . '">';
 
-            $pattern = array(
+        $highlight_line = 0;
+        if ( ! empty(self::$highlight))
+        {
+            $highlight_line = self::$highlight['line'];
+            $highlight_attr = '';
+            foreach (self::$highlight['attr'] as $key => $values)
+            {
+                $highlight_attr .= ' ' . $key . '="' . $values . '"';
+            }
+        }
+
+        $start_number = 0;
+        $end_number = 0;
+        $show_unprocessed = false;
+        if (self::$line_number !== [])
+        {
+            $show_unprocessed = self::$line_number['skip'];
+            $start_number = self::$line_number['start'];
+            $end_number = self::$line_number['end'];
+        }
+
+        $is_multi_line_quote = false;
+        $is_multi_line_comment = false;
+        $quote_opened = false;
+        $line_number = self::$show_line_number;
+        foreach (preg_split('/\n/', $code) as $count => $lines)
+        {
+
+            if (($count + 1) < $start_number)
+            {
+                if ( ! $show_unprocessed)
+                {
+                    continue;
+                }
+                else
+                {
+                    $line_num = ($line_number) ? ($count + 1) : '';
+                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
+                    continue;
+                }
+            }
+            elseif (($end_number != 0) && ($count >= $end_number))
+            {
+                if ( ! $show_unprocessed)
+                {
+                    break;
+                }
+                else
+                {
+                    $line_num = ($line_number) ? ($count + 1) : '';
+                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
+                    continue;
+                }
+            }
+
+            $start_number = $count + 1;
+
+            $gui_line_number = ($line_number) ? '<td>' . $start_number . '</td><td>' : '<td>';
+
+            if ($start_number == $highlight_line)
+            {
+                $gui_highlight = '<tr' . $highlight_attr . '>';
+            }
+            else
+            {
+                $gui_highlight = '<tr>';
+            }
+
+            $new_code .= $gui_highlight . $gui_line_number;
+
+            if ( ! $is_multi_line_quote)
+            {
+                if ($is_multi_line_comment)
+                {
+                    $lines = '<font style="color:#' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
+                }
+
+                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function(array $matches) use (&$is_multi_line_comment): string
+                {
+                    if ($matches[0] == '*/')
+                    {
+                        $is_multi_line_comment = false;
+                        return $matches[0] . '</font>';
+                    }
+                    else
+                    {
+                        $is_multi_line_comment = true;
+                        return '<font style="color:#' . self::$multi_line_comment . '" class="strip multi_line_comment">' . $matches[0];
+                    }
+
+                }, $lines);
+            }
+
+            if ( ! $is_multi_line_comment)
+            {
+                if ($is_multi_line_quote)
+                {
+                    $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
+                }
+
+                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$quote_opened, &$is_multi_line_quote): string
+                {
+                    if ($quote_opened)
+                    {
+                        $is_multi_line_quote = false;
+                        $quote_opened = false;
+                        return $matches[0] . '</font>';
+                    }
+                    else
+                    {
+                        $quote_opened = true;
+                        $is_multi_line_quote = true;
+                        return '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[0];
+                    }
+
+                }, $lines);
+            }
+
+            $pattern = [
                 self::$operators_ptrn,
                 self::$number_ptrn,
-                trim(preg_replace('/\s\s+/', '', self::$keywords_ptrn)),
+                preg_replace('/\s\s+/', '', self::$keywords_ptrn),
                 self::$function_ptrn,
                 self::$variable_ptrn,
-                self::$cast_ptrn
-            );
-
-            $replacement = array(
-                self::span(self::$operators, 'operators'),
-                self::span(self::$number, 'number'),
-                self::span(self::$keywords, 'keyword'),
-                self::span(self::$function, 'function', '$1'),
-                self::span(self::$variable, 'variable'),
-                self::span(self::$cast, 'cast')
-            );
-
-            $new_line = self::PR($pattern, $replacement, $lines);
-
-            $new_line = self::isFunction($new_line);
-
-            $pattern = array(
+                self::$cast_ptrn,
                 self::$constant_ptrn,
                 self::$parenthesis_ptrn,
                 self::$curly_braces_ptrn,
@@ -214,51 +311,46 @@ class Highlight
                 '/PP_PHP_SHORT_TAG_OPEN/',
                 '/PP_PHP_CLOSE_TAG/',
                 '/PP_PHP_DOUBLE_BACK_SLASH/'
-            );
+            ];
 
-            $replacement = array(
-                self::span(self::$constant, 'constant'),
-                self::span(self::$parenthesis, 'parenthesis'),
-                self::span(self::$curly_braces, 'curly_braces'),
-                self::span(self::$square_bracket, 'square_bracket'),
-                self::span(self::$null, 'null'),
-                self::span(self::$self, 'self'),
-                self::span(self::$parent, 'parent'),
-                self::span(self::$bool, 'bool'),
-                self::span(self::$comment, 'strip comment'),
-                self::span(self::$parameter_type, 'parameter_type'),
-                self::span(self::$return_type, 'return_type'),
-                self::span(self::$semi_colon, 'semi_colon'),
-                self::span(self::$tag_open, 'tag long', '&lt;?php'),
-                self::span(self::$tag_open, 'tag short', '&lt;?='),
-                self::span(self::$tag_close, 'tag clode', '?>'),
-                '\\\\\\'
-            );
-            $new_code .= self::PR($pattern, $replacement, $new_line) . '</div>';
+            $replacement = [
+                '<span style="color:#' . self::$operators .'" class="operators">$0</span>',
+                '<span style="color:#' . self::$number .'" class="number">$0</span>',
+                '<span style="color:#' . self::$keywords .'" class="keyword">$0</span>',
+                '<span style="color:#' . self::$function .'" class="function">$1</span>',
+                '<span style="color:#' . self::$variable .'" class="variable">$0</span>',
+                '<span style="color:#' . self::$cast .'" class="cast">$0</span>',
+                '<span style="color:#' . self::$constant .'" class="constant">$0</span>',
+                '<span style="color:#' . self::$parenthesis .'" class="parenthesis">$0</span>',
+                '<span style="color:#' . self::$curly_braces .'" class="curly_braces">$0</span>',
+                '<span style="color:#' . self::$square_bracket .'" class="square_bracket">$0</span>',
+                '<span style="color:#' . self::$null .'" class="null">$0</span>',
+                '<span style="color:#' . self::$self .'" class="self">$0</span>',
+                '<span style="color:#' . self::$parent .'" class="parent">$0</span>',
+                '<span style="color:#' . self::$bool .'" class="bool">$0</span>',
+                '<span style="color:#' . self::$comment .'" class="strip comment">$0</span>',
+                '<span style="color:#' . self::$parameter_type .'" class="parameter_type">$0</span>',
+                '<span style="color:#' . self::$return_type .'" class="return_type">$0</span>',
+                '<span style="color:#' . self::$semi_colon .'" class="semi_colon">$0</span>',
+                '<span style="color:#' . self::$tag_open .'" class="tag long">&lt;?php</span>',
+                '<span style="color:#' . self::$tag_open .'" class="tag short">&lt;?=</span>',
+                '<span style="color:#' . self::$tag_close .'" class="tag clode">?></span>',
+                '\\\\\\',
+            ];
 
+            $lines = self::isFunction($lines);
+            $lines = preg_replace($pattern, $replacement, $lines);
+            $new_code .= $lines . '</td></tr>';
         }
 
-        $pattern = array(
-            self::$multi_line_comment_ptrn,
-            trim(preg_replace('/\s\s+/', '', self::$quote_ptrn))
-        );
 
-        $replacement = array(
-            self::font(self::$multi_line_comment, 'strip multi_line_comment', '$0'),
-            self::font(self::$quote, 'strip quote', '$0')
-        );
+        $new_code = str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code);
 
-        $new_code = self::PR($pattern, $replacement, $new_code);
-        $new_code = str_replace(array('\"', '\\\''), array('"', '\''), $new_code);
+        $style = '.strip font,.strip span{color:inherit !important}';
+        $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
 
-        if ($tabs_to_space) {
-            $new_code = preg_replace('/\t/', '&nbsp;&nbsp;&nbsp;&nbsp;', $new_code);
-        }
-
-        $style = '.strip font,.strip span{color:inherit !important}' . self::$styled;
-        $pretty = '<pre>'. $new_code . '</pre><style>' . $style . '</style>';
-
-        if ($cache) {
+        if ($cache)
+        {
             self::cache($file_name, $pretty);
         }
         return $pretty;
@@ -326,44 +418,5 @@ class Highlight
             return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
         }
         return self::format($code, '', false, true);
-    }
-
-
-    /**
-     * sets formatted string out layer style
-     *
-     * @param array $style
-     * @param bool $line
-     * @param bool $line_number
-     */
-    public static function setStyle(array $style, bool $line = true, bool $line_number = true): void
-    {
-        @$margin = $style['line_number_width'];
-        @$padding = $style['line_padding'];
-        @$line_border = $style['line_border_color'];
-        @$line_no_border = $style['line_number_border_color'];
-        @$line_no_color = $style['line_number_color'];
-        @$line_no_border_scale = $style['line_no_border_scale'];
-        @$line_border_scale = $style['line_border_scale'];
-
-        $styled = '.line{
-		  ' . (($line) ? 'border-bottom: ' . $line_border_scale . 'px solid #' . $line_border . ';' : '') .'
-		  margin-left:' . $margin . 'px;
-		  padding:' . $padding . 'px 0;
-		}';
-
-        if ($line_number) {
-            $styled .= '.line::before{
-			  content:attr(label);
-			  position: absolute;
-			  padding:' . ($padding + 1) . 'px 0;
-			  width:' . $margin . 'px;
-			  margin-top: -6px;
-			  margin-left: -' . ($margin + 5) . 'px;
-			  color: #' . $line_no_color . ';
-			  border-right: ' . $line_no_border_scale . 'px solid #' . $line_no_border . ';
-			 }';
-        }
-        self::$styled = trim(preg_replace('/\s\s+/', '', $styled));
     }
 }
