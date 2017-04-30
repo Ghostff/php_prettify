@@ -25,12 +25,12 @@ class Highlight
     private static $constant = '8C4D03';
     private static $tag_close = 'F00000';
     private static $operators = '0000FF';
-	private static $semi_colon = '000000';
+    private static $semi_colon = '000000';
     private static $parenthesis = '038C8C';
-	private static $return_type = 'E3093F';
+    private static $return_type = 'E3093F';
     private static $php_function = '6367A7';
     private static $curly_braces = '7F5217';
-	private static $parameter_type = 'E3093F';
+    private static $parameter_type = 'E3093F';
     private static $square_bracket = 'F46164';
     private static $custom_function = 'A611AA';
     private static $multi_line_comment = 'FEA500';
@@ -40,10 +40,10 @@ class Highlight
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $quote_ptrn = '/(?<!\\\)\'(.*?)|(?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>)(.*?)/';
+    private static $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style|class|label)=))")/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
-    private static $comment_ptrn = '/(?<!(http(s):))\/\/.*|(?<!color:)#.*/';
+    private static $comment_ptrn = '/(?<!http:|https:)\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s|^)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
@@ -151,6 +151,35 @@ class Highlight
     }
 
 
+    private static function prepare(string $formated): string
+    {
+        $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
+        if (file_get_contents($theme_file))
+        {
+            $_theme = file_get_contents($theme_file);
+            $theme = json_decode($_theme, true);
+
+            $selected = $theme['selected'];
+            $active = $theme[$selected];
+            array_shift($active);
+            $searches = [];
+
+            foreach ($active as $key => $attributes)
+            {
+                $attributes = array_map(function (string $key, string $value): string {
+                    return $key . ':' . $value . ';';
+                }, array_keys($attributes), $attributes);
+
+                $replacements['style="color:#' . $key] = implode($attributes);
+            }
+
+        }
+
+        return $formated;
+
+    }
+
+
     /**
      * processes supplied text
      *
@@ -195,9 +224,12 @@ class Highlight
         $is_multi_line_comment = false;
         $quote_opened = false;
         $line_number = self::$show_line_number;
+
         foreach (preg_split('/\n/', $code) as $count => $lines)
         {
 
+            #single line comment
+            $SLC = false;
             if (($count + 1) < $start_number)
             {
                 if ( ! $show_unprocessed)
@@ -270,7 +302,7 @@ class Highlight
                     $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$quote_opened, &$is_multi_line_quote): string
+                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$quote_opened, &$is_multi_line_quote, &$SLC): string
                 {
                     if ($quote_opened)
                     {
@@ -280,9 +312,14 @@ class Highlight
                     }
                     else
                     {
+                        if ((strpos($matches[1], '//') !== false) || (strpos($matches[1], '#') !== false) || $SLC)
+                        {
+                            $SLC = true;
+                            return $matches[0];
+                        }
                         $quote_opened = true;
                         $is_multi_line_quote = true;
-                        return '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[0];
+                        return $matches[1] . '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[2];
                     }
 
                 }, $lines);
@@ -344,7 +381,8 @@ class Highlight
         }
 
 
-        $new_code = str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code);
+        $new_code = self::prepare(str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code));
+
 
         $style = '.strip font,.strip span{color:inherit !important}';
         $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
@@ -415,6 +453,7 @@ class Highlight
                     return $cached;
                 }
             }
+
             return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
         }
         return self::format($code, '', false, true);

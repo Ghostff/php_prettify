@@ -92,19 +92,22 @@ class Highlight
      * @param string $code
      * @return string
      */
-    private static function isFunction( $code)
+    private static function isFunction($code)
     {
-        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg)
+        $php_func = self::$php_function;
+        $custom_func = self::$custom_function;
+        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg) use ($php_func, $custom_func)
         {
             $func = $arg[1];
             if (function_exists($func))
             {
-                return '<span style="color:#' . self::$php_function .'" class="php_function">' . $func . '</span>';
+                return '<span style="color:#' . $php_func .'" class="php_function">' . $func . '</span>';
             }
             else
             {
-                return '<span style="color:#' . self::$custom_function .'" class="custom_function">' . $func . '</span>';
+                return '<span style="color:#' . $custom_func .'" class="custom_function">' . $func . '</span>';
             }
+
         }, $code);
     }
 
@@ -139,7 +142,7 @@ class Highlight
      * @param int $line
      * @param array $attributes
      */
-    public static function setHighlight($line, $attributes = [])
+    public static function setHighlight($line, $attributes = array())
     {
         self::$highlight['line'] = $line;
         self::$highlight['attr'] = $attributes;
@@ -156,8 +159,8 @@ class Highlight
     private static function format($code, $file_name, $cache)
     {
         $code = str_replace(
-            ['<?php', '<?=', '?>', '\\\\'],
-            ['PP_PHP_LONG_TAG_OPEN', 'PP_PHP_SHORT_TAG_OPEN', 'PP_PHP_CLOSE_TAG', 'PP_PHP_DOUBLE_BACK_SLASH'],
+            array('<?php', '<?=', '?>', '\\\\'),
+            array('PP_PHP_LONG_TAG_OPEN', 'PP_PHP_SHORT_TAG_OPEN', 'PP_PHP_CLOSE_TAG', 'PP_PHP_DOUBLE_BACK_SLASH'),
             $code
         );
 
@@ -178,7 +181,7 @@ class Highlight
         $start_number = 0;
         $end_number = 0;
         $show_unprocessed = false;
-        if (self::$line_number !== [])
+        if ( ! empty(self::$line_number))
         {
             $show_unprocessed = self::$line_number['skip'];
             $start_number = self::$line_number['start'];
@@ -227,6 +230,7 @@ class Highlight
             {
                 $gui_highlight = '<tr' . $highlight_attr . '>';
             }
+
             else
             {
                 $gui_highlight = '<tr>';
@@ -241,7 +245,8 @@ class Highlight
                     $lines = '<font style="color:#' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function($matches) use (&$is_multi_line_comment)
+                $comment = self::$multi_line_comment;
+                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function($matches) use (&$is_multi_line_comment, $comment)
                 {
                     if ($matches[0] == '*/')
                     {
@@ -251,7 +256,7 @@ class Highlight
                     else
                     {
                         $is_multi_line_comment = true;
-                        return '<font style="color:#' . self::$multi_line_comment . '" class="strip multi_line_comment">' . $matches[0];
+                        return '<font style="color:#' . $comment . '" class="strip multi_line_comment">' . $matches[0];
                     }
 
                 }, $lines);
@@ -264,7 +269,8 @@ class Highlight
                     $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$quote_ptrn, function($matches) use (&$quote_opened, &$is_multi_line_quote)
+                $quote = self::$quote;
+                $lines = preg_replace_callback(self::$quote_ptrn, function($matches) use (&$quote_opened, &$is_multi_line_quote, $quote)
                 {
                     if ($quote_opened)
                     {
@@ -276,13 +282,13 @@ class Highlight
                     {
                         $quote_opened = true;
                         $is_multi_line_quote = true;
-                        return '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[0];
+                        return '<font style="color:#' . $quote . '" class="strip quote">' . $matches[0];
                     }
 
                 }, $lines);
             }
 
-            $pattern = [
+            $pattern = array(
                 self::$operators_ptrn,
                 self::$number_ptrn,
                 preg_replace('/\s\s+/', '', self::$keywords_ptrn),
@@ -305,9 +311,9 @@ class Highlight
                 '/PP_PHP_SHORT_TAG_OPEN/',
                 '/PP_PHP_CLOSE_TAG/',
                 '/PP_PHP_DOUBLE_BACK_SLASH/'
-            ];
+            );
 
-            $replacement = [
+            $replacement = array(
                 '<span style="color:#' . self::$operators .'" class="operators">$0</span>',
                 '<span style="color:#' . self::$number .'" class="number">$0</span>',
                 '<span style="color:#' . self::$keywords .'" class="keyword">$0</span>',
@@ -330,7 +336,7 @@ class Highlight
                 '<span style="color:#' . self::$tag_open .'" class="tag short">&lt;?=</span>',
                 '<span style="color:#' . self::$tag_close .'" class="tag clode">?></span>',
                 '\\\\\\',
-            ];
+            );
 
             $lines = self::isFunction($lines);
             $lines = preg_replace($pattern, $replacement, $lines);
@@ -338,7 +344,7 @@ class Highlight
         }
 
 
-        $new_code = str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code);
+        $new_code = str_replace(array('\"', '\\\'', '  '), array('"', '\'', '&nbsp;&nbsp;'), $new_code);
 
         $style = '.strip font,.strip span{color:inherit !important}';
         $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
