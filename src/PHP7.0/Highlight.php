@@ -220,44 +220,20 @@ class Highlight
             $end_number = self::$line_number['end'];
         }
 
-        $is_multi_line_quote = false;
+        #is_multi_line_comment
+        $is_MLC = false;
         $is_multi_line_comment = false;
-        $quote_opened = false;
+        #quote_opened
+        $QO = false;
+        #qoute_type
+        $QT = null;
         $line_number = self::$show_line_number;
 
         foreach (preg_split('/\n/', $code) as $count => $lines)
         {
-
             #single line comment
             $SLC = false;
-            if (($count + 1) < $start_number)
-            {
-                if ( ! $show_unprocessed)
-                {
-                    continue;
-                }
-                else
-                {
-                    $line_num = ($line_number) ? ($count + 1) : '';
-                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
-                    continue;
-                }
-            }
-            elseif (($end_number != 0) && ($count >= $end_number))
-            {
-                if ( ! $show_unprocessed)
-                {
-                    break;
-                }
-                else
-                {
-                    $line_num = ($line_number) ? ($count + 1) : '';
-                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
-                    continue;
-                }
-            }
-
-            $start_number = $count + 1;
+            $start_number++;
 
             $gui_line_number = ($line_number) ? '<td>' . $start_number . '</td><td>' : '<td>';
 
@@ -272,7 +248,7 @@ class Highlight
 
             $new_code .= $gui_highlight . $gui_line_number;
 
-            if ( ! $is_multi_line_quote)
+            if ( ! $is_MLC)
             {
                 if ($is_multi_line_comment)
                 {
@@ -297,17 +273,17 @@ class Highlight
 
             if ( ! $is_multi_line_comment)
             {
-                if ($is_multi_line_quote)
+                if ($is_MLC)
                 {
                     $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$quote_opened, &$is_multi_line_quote, &$SLC): string
+                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$QO, &$is_MLC, &$SLC, &$QT): string
                 {
-                    if ($quote_opened)
+                    if ($QO && $QT == $matches[2])
                     {
-                        $is_multi_line_quote = false;
-                        $quote_opened = false;
+                        $is_MLC = false;
+                        $QO = false;
                         return $matches[0] . '</font>';
                     }
                     else
@@ -317,8 +293,9 @@ class Highlight
                             $SLC = true;
                             return $matches[0];
                         }
-                        $quote_opened = true;
-                        $is_multi_line_quote = true;
+                        $QO = true;
+                        $QT = $matches[2];
+                        $is_MLC = true;
                         return $matches[1] . '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[2];
                     }
 
