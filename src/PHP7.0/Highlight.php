@@ -154,7 +154,7 @@ class Highlight
     private static function prepare(string $formated): string
     {
         $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
-        if (file_get_contents($theme_file))
+        if (file_exists($theme_file))
         {
             $_theme = file_get_contents($theme_file);
             $theme = json_decode($_theme, true);
@@ -380,9 +380,8 @@ class Highlight
             $new_code .= $lines . '</td></tr>';
         }
 
-
+        $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
         $new_code = self::prepare(str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code));
-
 
         $style = '.strip font,.strip span{color:inherit !important}';
         $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
