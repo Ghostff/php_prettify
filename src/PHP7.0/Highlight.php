@@ -6,7 +6,7 @@ class Highlight
 {
 
     private static $highlight = [];
-    private static $line_number = [];
+    private static $start_line = 0;
     private static $cache_path = null;
     private static $show_line_number = false;
 
@@ -118,25 +118,12 @@ class Highlight
      *
      * @param bool $switch
      */
-    public static function showLineNumber(bool $switch)
+    public static function showLineNumber(bool $switch, int $start_line = 0)
     {
+        self::$start_line = $start_line;
         self::$show_line_number = $switch;
     }
 
-
-    /**
-     * declares the line at which text processing begin or ends
-     *
-     * @param int $from
-     * @param int $to
-     * @param bool $show_unprocessed
-     */
-    public static function setRange(int $from = 0, int $to = 0, bool $show_unprocessed = false)
-    {
-        self::$line_number['start'] = $from;
-        self::$line_number['end'] = $to;
-        self::$line_number['skip'] = $show_unprocessed;
-    }
 
     /**
      * adds html attributes to line table > tr
@@ -210,15 +197,7 @@ class Highlight
             }
         }
 
-        $start_number = 0;
-        $end_number = 0;
-        $show_unprocessed = false;
-        if (self::$line_number !== [])
-        {
-            $show_unprocessed = self::$line_number['skip'];
-            $start_number = self::$line_number['start'];
-            $end_number = self::$line_number['end'];
-        }
+        $start_number = self::$start_line;
 
         #is_multi_line_comment
         $is_MLC = false;
@@ -228,9 +207,8 @@ class Highlight
         #qoute_type
         $QT = null;
         $line_number = self::$show_line_number;
-        var_dump($code);
 
-        foreach (preg_split('/\n/', $code) as $count => $lines)
+        foreach (preg_split('/\n/', $code) as $lines)
         {
             #single line comment
             $SLC = false;
