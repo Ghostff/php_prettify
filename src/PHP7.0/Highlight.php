@@ -228,6 +228,7 @@ class Highlight
         #qoute_type
         $QT = null;
         $line_number = self::$show_line_number;
+        var_dump($code);
 
         foreach (preg_split('/\n/', $code) as $count => $lines)
         {
@@ -280,11 +281,15 @@ class Highlight
 
                 $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$QO, &$is_MLC, &$SLC, &$QT): string
                 {
-                    if ($QO && $QT == $matches[2])
+                    if ($QO)
                     {
-                        $is_MLC = false;
-                        $QO = false;
-                        return $matches[0] . '</font>';
+                        if ($QT == $matches[2])
+                        {
+                            $is_MLC = false;
+                            $QO = false;
+                            return $matches[0] . '</font>';
+                        }
+                        return $matches[0];
                     }
                     else
                     {
@@ -358,7 +363,7 @@ class Highlight
         }
 
         $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
-        $new_code = self::prepare(str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code));
+        #$new_code = self::prepare(str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code));
 
         $style = '.strip font,.strip span{color:inherit !important}';
         $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
