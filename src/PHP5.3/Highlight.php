@@ -96,7 +96,7 @@ class Highlight
     {
         $php_func = self::$php_function;
         $custom_func = self::$custom_function;
-        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function ($arg) use ($php_func, $custom_func)
+        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function (array $arg) use ($php_func, $custom_func)
         {
             $func = $arg[1];
             if (function_exists($func))
@@ -105,6 +105,10 @@ class Highlight
             }
             else
             {
+                if($func == 'array')
+                {
+                    return $func;
+                }
                 return '<span style="color:#' . $custom_func .'" class="custom_function">' . $func . '</span>';
             }
 

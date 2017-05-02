@@ -1,40 +1,29 @@
 <?php
 
-/*
-*
-* LIGHT VERSION
-* You can list all arguments using
-* ReflectionFunction class
-*
-*/
+namespace Text;
 
-class ClassTest
+class Text extends TextProcess implements Php
 {
-    public static function FunctionTest(array $value = array(), bool $is_boll = false): string
+    /**
+     * An array of the types that have been resolved.
+     *
+     * @var array
+     */
+    protected $resolved = array();
+
+    public function isShared(string $abstract, int $counter): bool
     {
-        $count = 10 + 233;
-        self::testMethod();
-        self::$test_property;
-        static::testMethod();
-        $functions = get_defined_functions();
-        ( array ) $functions_list = $value;
-        foreach ($functions['user'] as $func) {
-            $f = new ReflectionFunction($func);
-            $args = array();
-            foreach ($f->getParameters() as $param) {
-                $tmparg = null;
-                if ($param->isPassedByReference()) $tmparg = '&';
-                if ($param->isOptional()) {
-                    $tmparg = '[' . $tmparg . '$' . $param->getName() . ' = ' . $param->getDefaultValue() . ']';
-                } else {
-                    $tmparg.= '&' . $param->getName();
-                }
-                $args[] = trim($tmparg);
-                unset ($tmparg);
-            }
-            $functions_list[] = 'function ' . $func . ' ( ' . implode(', ', $args) . ' )' . PHP_EOL;
+        self::init(mt_rand(1, 55), parent::__construct());
+        if (isset($this->bindings[$abstract]['shared']))
+        {
+            #cast to bool
+            (bool) $shared = $this->bindings[$abstract]['shared'];
         }
-        print_r($functions_list);
-        return self::test("Double Quote Test");
+        else
+        {
+            $shared = false;
+        }
+
+        return isset($this->instances[$abstract]) || $shared === true;
     }
 }
