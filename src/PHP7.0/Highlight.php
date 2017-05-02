@@ -138,7 +138,7 @@ class Highlight
     }
 
 
-    private static function prepare(string $formated): string
+    private static function theme(string $name)
     {
         $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
         if (file_exists($theme_file))
@@ -199,13 +199,10 @@ class Highlight
 
         $start_number = self::$start_line;
 
-        #is_multi_line_comment
-        $is_MLC = false;
-        $is_multi_line_comment = false;
-        #quote_opened
-        $QO = false;
-        #qoute_type
-        $QT = null;
+        $is_MLQ = false; #is_multi_line_quote
+        $is_MLC = false; #is_multi_line_comment
+        $QO = false; #quote_opened
+        $QT = null; #qoute_type
         $line_number = self::$show_line_number;
 
         foreach (preg_split('/\n/', $code) as $lines)
@@ -227,43 +224,43 @@ class Highlight
 
             $new_code .= $gui_highlight . $gui_line_number;
 
-            if ( ! $is_MLC)
+            if ( ! $is_MLQ)
             {
-                if ($is_multi_line_comment)
+                if ($is_MLC)
                 {
                     $lines = '<font style="color:#' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function(array $matches) use (&$is_multi_line_comment): string
+                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function(array $matches) use (&$is_MLC): string
                 {
                     if ($matches[0] == '*/')
                     {
-                        $is_multi_line_comment = false;
+                        $is_MLC = false;
                         return $matches[0] . '</font>';
                     }
                     else
                     {
-                        $is_multi_line_comment = true;
+                        $is_MLC = true;
                         return '<font style="color:#' . self::$multi_line_comment . '" class="strip multi_line_comment">' . $matches[0];
                     }
 
                 }, $lines);
             }
 
-            if ( ! $is_multi_line_comment)
+            if ( ! $is_MLC)
             {
-                if ($is_MLC)
+                if ($is_MLQ)
                 {
                     $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
-                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$QO, &$is_MLC, &$SLC, &$QT): string
+                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$QO, &$is_MLQ, &$SLC, &$QT): string
                 {
                     if ($QO)
                     {
                         if ($QT == $matches[2])
                         {
-                            $is_MLC = false;
+                            $is_MLQ = false;
                             $QO = false;
                             return $matches[0] . '</font>';
                         }
@@ -278,7 +275,7 @@ class Highlight
                         }
                         $QO = true;
                         $QT = $matches[2];
-                        $is_MLC = true;
+                        $is_MLQ = true;
                         return $matches[1] . '<font style="color:#' . self::$quote . '" class="strip quote">' . $matches[2];
                     }
 
@@ -341,7 +338,7 @@ class Highlight
         }
 
         $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
-        #$new_code = self::prepare(str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code));
+        $new_code = str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code);
 
         $style = '.strip font,.strip span{color:inherit !important}';
         $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';

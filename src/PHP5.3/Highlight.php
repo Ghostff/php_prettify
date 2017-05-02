@@ -5,7 +5,7 @@ namespace PhpPrettify;
 class Highlight
 {
     private static $highlight = array();
-    private static $line_number = array();
+    private static $start_line = 0;
     private static $cache_path = null;
     private static $show_line_number = false;
 
@@ -39,10 +39,10 @@ class Highlight
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $quote_ptrn = '/(?<!\\\)\'(.*?)|(?<!((style|class|label)=)|(\\\))"(?!\s(class|label)=|>)(.*?)/';
+    private static $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style|class|label)=))")/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
-    private static $comment_ptrn = '/(?<!(http(s):))\/\/.*|(?<!color:)#.*/';
+    private static $comment_ptrn = '/(?<!http:|https:)\/\/.*|(?<!color:)#.*/';
     private static $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private static $function_ptrn = '/(?<=\s|^)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
@@ -116,25 +116,12 @@ class Highlight
      *
      * @param bool $switch
      */
-    public static function showLineNumber($switch)
+    public static function showLineNumber($switch, $start_line = 0)
     {
+        self::$start_line = $start_line;
         self::$show_line_number = $switch;
     }
 
-
-    /**
-     * declares the line at which text processing begin or ends
-     *
-     * @param int $from
-     * @param int $to
-     * @param bool $show_unprocessed
-     */
-    public static function setRange($from = 0, $to = 0, $show_unprocessed = false)
-    {
-        self::$line_number['start'] = $from;
-        self::$line_number['end'] = $to;
-        self::$line_number['skip'] = $show_unprocessed;
-    }
 
     /**
      * adds html attributes to line table > tr
@@ -178,51 +165,20 @@ class Highlight
             }
         }
 
-        $start_number = 0;
-        $end_number = 0;
-        $show_unprocessed = false;
-        if ( ! empty(self::$line_number))
-        {
-            $show_unprocessed = self::$line_number['skip'];
-            $start_number = self::$line_number['start'];
-            $end_number = self::$line_number['end'];
-        }
+        $start_number = self::$start_line;
 
-        $is_multi_line_quote = false;
-        $is_multi_line_comment = false;
-        $quote_opened = false;
+
+        $is_MLQ = false; #is_multi_line_quote
+        $is_MLC = false; #is_multi_line_comment
+        $QO = false; #quote_opened
+        $QT = null; #qoute_type
         $line_number = self::$show_line_number;
-        foreach (preg_split('/\n/', $code) as $count => $lines)
+
+        foreach (preg_split('/\n/', $code) as $lines)
         {
-
-            if (($count + 1) < $start_number)
-            {
-                if ( ! $show_unprocessed)
-                {
-                    continue;
-                }
-                else
-                {
-                    $line_num = ($line_number) ? ($count + 1) : '';
-                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
-                    continue;
-                }
-            }
-            elseif (($end_number != 0) && ($count >= $end_number))
-            {
-                if ( ! $show_unprocessed)
-                {
-                    break;
-                }
-                else
-                {
-                    $line_num = ($line_number) ? ($count + 1) : '';
-                    $new_code .= '<tr><td>' . $line_num . '</td><td>' . $lines . '</td></tr>';
-                    continue;
-                }
-            }
-
-            $start_number = $count + 1;
+            #single line comment
+            $SLC = false;
+            $start_number++;
 
             $gui_line_number = ($line_number) ? '<td>' . $start_number . '</td><td>' : '<td>';
 
@@ -230,7 +186,6 @@ class Highlight
             {
                 $gui_highlight = '<tr' . $highlight_attr . '>';
             }
-
             else
             {
                 $gui_highlight = '<tr>';
@@ -238,51 +193,61 @@ class Highlight
 
             $new_code .= $gui_highlight . $gui_line_number;
 
-            if ( ! $is_multi_line_quote)
+            if ( ! $is_MLQ)
             {
-                if ($is_multi_line_comment)
+                if ($is_MLC)
                 {
                     $lines = '<font style="color:#' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
                 }
 
                 $comment = self::$multi_line_comment;
-                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function($matches) use (&$is_multi_line_comment, $comment)
+                $lines = preg_replace_callback(self::$multi_line_comment_ptrn, function(array $matches) use (&$is_MLC, $comment)
                 {
                     if ($matches[0] == '*/')
                     {
-                        $is_multi_line_comment = false;
+                        $is_MLC = false;
                         return $matches[0] . '</font>';
                     }
                     else
                     {
-                        $is_multi_line_comment = true;
+                        $is_MLC = true;
                         return '<font style="color:#' . $comment . '" class="strip multi_line_comment">' . $matches[0];
                     }
 
                 }, $lines);
             }
 
-            if ( ! $is_multi_line_comment)
+            if ( ! $is_MLC)
             {
-                if ($is_multi_line_quote)
+                if ($is_MLQ)
                 {
                     $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
                 $quote = self::$quote;
-                $lines = preg_replace_callback(self::$quote_ptrn, function($matches) use (&$quote_opened, &$is_multi_line_quote, $quote)
+                $lines = preg_replace_callback(self::$quote_ptrn, function(array $matches) use (&$QO, &$is_MLQ, &$SLC, &$QT, $quote)
                 {
-                    if ($quote_opened)
+                    if ($QO)
                     {
-                        $is_multi_line_quote = false;
-                        $quote_opened = false;
-                        return $matches[0] . '</font>';
+                        if ($QT == $matches[2])
+                        {
+                            $is_MLQ = false;
+                            $QO = false;
+                            return $matches[0] . '</font>';
+                        }
+                        return $matches[0];
                     }
                     else
                     {
-                        $quote_opened = true;
-                        $is_multi_line_quote = true;
-                        return '<font style="color:#' . $quote . '" class="strip quote">' . $matches[0];
+                        if ((strpos($matches[1], '//') !== false) || (strpos($matches[1], '#') !== false) || $SLC)
+                        {
+                            $SLC = true;
+                            return $matches[0];
+                        }
+                        $QO = true;
+                        $QT = $matches[2];
+                        $is_MLQ = true;
+                        return $matches[1] . '<font style="color:#' . $quote . '" class="strip quote">' . $matches[2];
                     }
 
                 }, $lines);
@@ -343,7 +308,7 @@ class Highlight
             $new_code .= $lines . '</td></tr>';
         }
 
-
+        $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
         $new_code = str_replace(array('\"', '\\\'', '  '), array('"', '\'', '&nbsp;&nbsp;'), $new_code);
 
         $style = '.strip font,.strip span{color:inherit !important}';
