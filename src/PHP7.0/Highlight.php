@@ -145,7 +145,10 @@ class Highlight
     }
 
 
-    public static function theme(string $name)
+    /**
+     * @param string $name
+     */
+    public static function theme(string $name, bool $suppress_error = false)
     {
         $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
         if (file_exists($theme_file))
@@ -171,16 +174,22 @@ class Highlight
 
                     $style .= implode($styles);
                     self::$$property = $style;
-
                 }
-
             }
             else
             {
-                throw new \RuntimeException('Theme (' . $name . ') was not found');
+                if ( ! $suppress_error)
+                {
+                    throw new \RuntimeException('Theme (' . $name . ') was not found');
+                }
             }
-
-
+        }
+        else
+        {
+            if ( ! $suppress_error)
+            {
+                throw new \RuntimeException('No theme.json file found');
+            }
         }
 
     }

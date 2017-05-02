@@ -9,36 +9,39 @@ class Highlight
     private static $cache_path = null;
     private static $show_line_number = false;
 
-    private static $cast = '038C8C';
-    private static $null = '0000FF';
-    private static $bool = 'D8C300';
-    private static $self = '1D6F0C';
-    private static $quote = 'FF0000';
-    private static $parent = '1D6F0C';
-    private static $number = 'A4AC21';
-    private static $comment = 'FEA500';
-    private static $tag_open = 'F00000';
-    private static $keywords = '008000';
-    private static $function = '0000FF';
-    private static $variable = '2071ED';
-    private static $constant = '8C4D03';
-    private static $tag_close = 'F00000';
-    private static $operators = '0000FF';
-    private static $semi_colon = '000000';
-    private static $parenthesis = '038C8C';
-    private static $return_type = 'E3093F';
-    private static $php_function = '6367A7';
-    private static $curly_braces = '7F5217';
-    private static $parameter_type = 'E3093F';
-    private static $square_bracket = 'F46164';
-    private static $custom_function = 'A611AA';
-    private static $multi_line_comment = 'FEA500';
+    private static $body = '';
+    private static $cast = '#038C8C';
+    private static $null = '#0000FF';
+    private static $bool = '#D8C300';
+    private static $self = '#1D6F0C';
+    private static $quote = '#FF0000';
+    private static $class = '#000000';
+    private static $parent = '#1D6F0C';
+    private static $number = '#A4AC21';
+    private static $comment = '#FEA500';
+    private static $tag_open = '#F00000';
+    private static $keywords = '#008000';
+    private static $function = '#0000FF';
+    private static $variable = '#2071ED';
+    private static $constant = '#8C4D03';
+    private static $tag_close = '#F00000';
+    private static $operators = '#0000FF';
+    private static $semi_colon = '#000000';
+    private static $parenthesis = '#038C8C';
+    private static $return_type = '#E3093F';
+    private static $php_function = '#6367A7';
+    private static $curly_braces = '#7F5217';
+    private static $parameter_type = '#E3093F';
+    private static $square_bracket = '#F46164';
+    private static $custom_function = '#A611AA';
+    private static $multi_line_comment = '#FEA500';
 
 
     private static $self_ptrn = '/(?<!\$|\w)self/';
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
+    private static $class_ptrn = '/class (\w+)/';
     private static $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style|class|label)=))")/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
@@ -60,12 +63,12 @@ class Highlight
         (t(hrow|r(ait|y)))|
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
-    private static $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|\-|(?<!https|http| style="color)\:|\@|\||\?|&gt;|&lt;|&amp;)/';
+    private static $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|[^a-z+]-[^a-z+]|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
     private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
-    private static $curly_braces_ptrn = '/[\{|\}]/';
-    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\$)/';
+    private static $curly_braces_ptrn = '/[\{\}]/';
+    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span style="[\w:#-;]+" class="variable"\>\$)/';
     private static $square_bracket_ptrn = '/\[|\]/';
     private static $multi_line_comment_ptrn = '/\/\*|\*\//';
 
@@ -101,7 +104,7 @@ class Highlight
             $func = $arg[1];
             if (function_exists($func))
             {
-                return '<span style="color:#' . $php_func .'" class="php_function">' . $func . '</span>';
+                return '<span style="color:' . $php_func .'" class="php_function">' . $func . '</span>';
             }
             else
             {
@@ -109,7 +112,7 @@ class Highlight
                 {
                     return $func;
                 }
-                return '<span style="color:#' . $custom_func .'" class="custom_function">' . $func . '</span>';
+                return '<span style="color:' . $custom_func .'" class="custom_function">' . $func . '</span>';
             }
 
         }, $code);
@@ -137,6 +140,53 @@ class Highlight
     {
         self::$highlight['line'] = $line;
         self::$highlight['attr'] = $attributes;
+    }
+
+    /**
+     * @param string $name
+     */
+    public static function theme($name, $suppress_error = true)
+    {
+        $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
+        if (file_exists($theme_file))
+        {
+            $_theme = file_get_contents($theme_file);
+            $theme = json_decode($_theme, true);
+
+            if (isset($theme[$name]))
+            {
+                $properties = $theme[$name];
+                foreach ( $properties as $property => $styles)
+                {
+                    $style = '';
+                    if (isset($styles['color']))
+                    {
+                        $style = $styles['color'] . ';';
+                        unset($styles['color']);
+                    }
+
+                    $styles = array_map(function($keyword, $attributes) {
+                        return $keyword . ':' . $attributes . ';';
+                    }, array_keys($styles), $styles);
+
+                    $style .= implode($styles);
+                    self::$$property = $style;
+
+                }
+
+            }
+            else
+            {
+                if ( ! $suppress_error)
+                    throw new \RuntimeException('Theme (' . $name . ') was not found');
+            }
+        }
+        else
+        {
+            if ( ! $suppress_error)
+            throw new \RuntimeException('No theme.json file found');
+        }
+
     }
 
     /**
@@ -180,6 +230,12 @@ class Highlight
 
         foreach (preg_split('/\n/', $code) as $lines)
         {
+            $lines = preg_replace(
+                self::$semi_colon_ptrn,
+                '<span style="color:' . self::$semi_colon .'" class="semi_colon">$0</span>',
+                $lines
+            );
+
             #single line comment
             $SLC = false;
             $start_number++;
@@ -201,7 +257,7 @@ class Highlight
             {
                 if ($is_MLC)
                 {
-                    $lines = '<font style="color:#' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
+                    $lines = '<font style="color:' . self::$multi_line_comment .'" class="strip multi_line_comment">' . $lines . '</font>';
                 }
 
                 $comment = self::$multi_line_comment;
@@ -215,7 +271,7 @@ class Highlight
                     else
                     {
                         $is_MLC = true;
-                        return '<font style="color:#' . $comment . '" class="strip multi_line_comment">' . $matches[0];
+                        return '<font style="color:' . $comment . '" class="strip multi_line_comment">' . $matches[0];
                     }
 
                 }, $lines);
@@ -225,7 +281,7 @@ class Highlight
             {
                 if ($is_MLQ)
                 {
-                    $lines = '<font style="color:#' . self::$quote .'" class="strip quote">' . $lines . '</font>';
+                    $lines = '<font style="color:' . self::$quote .'" class="strip quote">' . $lines . '</font>';
                 }
 
                 $quote = self::$quote;
@@ -251,7 +307,7 @@ class Highlight
                         $QO = true;
                         $QT = $matches[2];
                         $is_MLQ = true;
-                        return $matches[1] . '<font style="color:#' . $quote . '" class="strip quote">' . $matches[2];
+                        return $matches[1] . '<font style="color:' . $quote . '" class="strip quote">' . $matches[2];
                     }
 
                 }, $lines);
@@ -260,6 +316,7 @@ class Highlight
             $pattern = array(
                 self::$operators_ptrn,
                 self::$number_ptrn,
+                self::$class_ptrn,
                 preg_replace('/\s\s+/', '', self::$keywords_ptrn),
                 self::$function_ptrn,
                 self::$variable_ptrn,
@@ -275,7 +332,6 @@ class Highlight
                 self::$comment_ptrn,
                 self::$parameter_type_ptrn,
                 self::$return_type_ptrn,
-                self::$semi_colon_ptrn,
                 '/PP_PHP_LONG_TAG_OPEN/',
                 '/PP_PHP_SHORT_TAG_OPEN/',
                 '/PP_PHP_CLOSE_TAG/',
@@ -283,27 +339,27 @@ class Highlight
             );
 
             $replacement = array(
-                '<span style="color:#' . self::$operators .'" class="operators">$0</span>',
-                '<span style="color:#' . self::$number .'" class="number">$0</span>',
-                '<span style="color:#' . self::$keywords .'" class="keyword">$0</span>',
-                '<span style="color:#' . self::$function .'" class="function">$1</span>',
-                '<span style="color:#' . self::$variable .'" class="variable">$0</span>',
-                '<span style="color:#' . self::$cast .'" class="cast">$0</span>',
-                '<span style="color:#' . self::$constant .'" class="constant">$0</span>',
-                '<span style="color:#' . self::$parenthesis .'" class="parenthesis">$0</span>',
-                '<span style="color:#' . self::$curly_braces .'" class="curly_braces">$0</span>',
-                '<span style="color:#' . self::$square_bracket .'" class="square_bracket">$0</span>',
-                '<span style="color:#' . self::$null .'" class="null">$0</span>',
-                '<span style="color:#' . self::$self .'" class="self">$0</span>',
-                '<span style="color:#' . self::$parent .'" class="parent">$0</span>',
-                '<span style="color:#' . self::$bool .'" class="bool">$0</span>',
-                '<span style="color:#' . self::$comment .'" class="strip comment">$0</span>',
-                '<span style="color:#' . self::$parameter_type .'" class="parameter_type">$0</span>',
-                '<span style="color:#' . self::$return_type .'" class="return_type">$0</span>',
-                '<span style="color:#' . self::$semi_colon .'" class="semi_colon">$0</span>',
-                '<span style="color:#' . self::$tag_open .'" class="tag long">&lt;?php</span>',
-                '<span style="color:#' . self::$tag_open .'" class="tag short">&lt;?=</span>',
-                '<span style="color:#' . self::$tag_close .'" class="tag clode">?></span>',
+                '<span style="color:' . self::$operators .'" class="operators">$0</span>',
+                '<span style="color:' . self::$number .'" class="number">$0</span>',
+                '<span style="color:' . self::$class .'" class="number">$0</span>',
+                '<span style="color:' . self::$keywords .'" class="keyword">$0</span>',
+                '<span style="color:' . self::$function .'" class="function">$1</span>',
+                '<span style="color:' . self::$variable .'" class="variable">$0</span>',
+                '<span style="color:' . self::$cast .'" class="cast">$0</span>',
+                '<span style="color:' . self::$constant .'" class="constant">$0</span>',
+                '<span style="color:' . self::$parenthesis .'" class="parenthesis">$0</span>',
+                '<span style="color:' . self::$curly_braces .'" class="curly_braces">$0</span>',
+                '<span style="color:' . self::$square_bracket .'" class="square_bracket">$0</span>',
+                '<span style="color:' . self::$null .'" class="null">$0</span>',
+                '<span style="color:' . self::$self .'" class="self">$0</span>',
+                '<span style="color:' . self::$parent .'" class="parent">$0</span>',
+                '<span style="color:' . self::$bool .'" class="bool">$0</span>',
+                '<span style="color:' . self::$comment .'" class="strip comment">$0</span>',
+                '<span style="color:' . self::$parameter_type .'" class="parameter_type">$0</span>',
+                '<span style="color:' . self::$return_type .'" class="return_type">$0</span>',
+                '<span style="color:' . self::$tag_open .'" class="tag long">&lt;?php</span>',
+                '<span style="color:' . self::$tag_open .'" class="tag short">&lt;?=</span>',
+                '<span style="color:' . self::$tag_close .'" class="tag clode">?></span>',
                 '\\\\\\',
             );
 
@@ -316,7 +372,7 @@ class Highlight
         $new_code = str_replace(array('\"', '\\\'', '  '), array('"', '\'', '&nbsp;&nbsp;'), $new_code);
 
         $style = '.strip font,.strip span{color:inherit !important}';
-        $pretty = '<table>'. $new_code . '</table><style>' . $style . '</style>';
+        $pretty = '<table style="' . self::$body .'">'. $new_code . '</table><style>' . $style . '</style>';
 
         if ($cache)
         {
