@@ -13,7 +13,7 @@ class Text extends TextProcess implements Php
 
     public function isShared(string $abstract, int $counter): bool
     {
-        self::init(mt_rand(1, 55), parent::__construct());
+        self::init(mt_rand(1, 55), parent::__construct(), ROOT_DIR);
         if (isset($this->bindings[$abstract]['shared']))
         {
             #cast to bool

@@ -1,10 +1,10 @@
 <?php
 
 use PhpPrettify\Highlight;
-require 'src/PHP5.3/Highlight.php';
+require 'src/PHP7.0/Highlight.php';
 
 Highlight::showLineNumber(true);
-#echo '<pre>', Highlight::render('code.txt', 1, 0), '</pre>';exit;
+//echo '<pre>', Highlight::render('code.txt', 1, 0), '</pre>';exit;
 
 ?>
 <!doctype html>
@@ -18,14 +18,15 @@ Highlight::showLineNumber(true);
             .code .name { padding: 5px 10px;font-size: 19px; text-align: center;font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif}
             table td:first-child { text-align: center}
             table td:last-child { padding-left: 10px;}
-            .default table td:last-child { padding-left: 10px;}
+            .default table td:first-child { background: #efefef;}
             .bittr table td:first-child { background: #272b34;}
             .dark table td:first-child { background: #151515;}
             .owerri table td:first-child { background: #403c37;}
             .light table td:first-child { background: #eeeeee;}
             .steady table td:first-child { background: #45403B;}
             .git table td:first-child { background: #eeeeee;}
-            .default table td:first-child { background: #efefef};
+            .imo table td:first-child { background: #eeeeee;}
+            .yola table td:first-child { background: #0c1018};
         </style>
     </head>
     <body>
@@ -63,6 +64,18 @@ Highlight::showLineNumber(true);
             <div class="name" style="background-color:#45403B; color: #EBD1B7;">steady</div>
             <div class="sample" style="color: #EBD1B7;">
                 <pre><?php Highlight::theme("steady"); echo Highlight::render('code.txt', 1, 0); ?></pre>
+            </div>
+        </div>
+        <div class="code imo">
+            <div class="name" style="background-color:#eeeeee; color: #555555;">imo</div>
+            <div class="sample" style="color: #555555;">
+                <pre><?php Highlight::theme("imo"); echo Highlight::render('code.txt', 1, 0); ?></pre>
+            </div>
+        </div>
+        <div class="code yola">
+            <div class="name" style="background-color:#0c1018; color: #ffffff;">yola</div>
+            <div class="sample" style="color: #ffffff;">
+                <pre><?php Highlight::theme("yola"); echo Highlight::render('code.txt', 1, 0); ?></pre>
             </div>
         </div>
         <div class="code git">

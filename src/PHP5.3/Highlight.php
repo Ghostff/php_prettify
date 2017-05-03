@@ -41,7 +41,7 @@ class Highlight
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $class_ptrn = '/class (\w+)/';
+    private static $class_ptrn = '/(class|extends|implements)\s+(\w+)/';
     private static $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style|class|label)=))")/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
@@ -138,8 +138,7 @@ class Highlight
      */
     public static function setHighlight($line, $attributes = array())
     {
-        self::$highlight['line'] = $line;
-        self::$highlight['attr'] = $attributes;
+        self::$highlight[$line] = $attributes;
     }
 
     /**
@@ -207,20 +206,7 @@ class Highlight
 
         $code = htmlspecialchars($code, ENT_NOQUOTES);
         $new_code = null;
-
-        $highlight_line = 0;
-        if ( ! empty(self::$highlight))
-        {
-            $highlight_line = self::$highlight['line'];
-            $highlight_attr = '';
-            foreach (self::$highlight['attr'] as $key => $values)
-            {
-                $highlight_attr .= ' ' . $key . '="' . $values . '"';
-            }
-        }
-
         $start_number = self::$start_line;
-
 
         $is_MLQ = false; #is_multi_line_quote
         $is_MLC = false; #is_multi_line_comment
@@ -242,8 +228,13 @@ class Highlight
 
             $gui_line_number = ($line_number) ? '<td>' . $start_number . '</td><td>' : '<td>';
 
-            if ($start_number == $highlight_line)
+            if (isset(self::$highlight[$start_number]))
             {
+                $highlight_attr = '';
+                foreach (self::$highlight[$start_number] as $key => $values)
+                {
+                    $highlight_attr .= ' ' . $key . '="' . $values . '"';
+                }
                 $gui_highlight = '<tr' . $highlight_attr . '>';
             }
             else
