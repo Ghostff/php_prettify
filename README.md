@@ -6,7 +6,7 @@ Outputs or returns html markup for a syntax highlighted version of the given PHP
 ## Optional methods
 ```php
 Highlight::showLineNumber($flag, $start_line); #Displays lines number, make text processing to start at a certain line
-Highlight::setHighlight($line_number, $arr_of_html_attr); #Add attribute(HTML) to a particular line
+Highlight::setHighlight($line_number, $arr_of_html_attr, $override); #Add attribute(HTML) to a particular line, replace existing attributes
 Highlight::theme($name, $default); #theme name, default if $name was not found
 ```
 

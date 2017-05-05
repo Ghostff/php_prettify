@@ -106,6 +106,7 @@ class Highlight
      * displays line numbers
      *
      * @param bool $switch
+     * @param int $start_line
      */
     public static function showLineNumber($switch, $start_line = 0)
     {
@@ -119,9 +120,14 @@ class Highlight
      *
      * @param int $line
      * @param array $attributes
+     * @param bool $override
      */
-    public static function setHighlight($line, $attributes = array())
+    public static function setHighlight($line, array $attributes = array(), $override = false)
     {
+        if ($override)
+        {
+            self::$highlight = array();
+        }
         self::$highlight[$line] = $attributes;
     }
 
