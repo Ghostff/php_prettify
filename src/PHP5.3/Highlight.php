@@ -74,22 +74,6 @@ class Highlight
 
 
     /**
-     * updates attributes of class property
-     *
-     * @param string $property
-     * @param string $values
-     * @return void
-     */
-    public static function set($property, $values)
-    {
-        if (property_exists(__CLASS__, $property)) {
-            self::${$property} = $values;
-        } else {
-            throw new RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
-        }
-    }
-
-    /**
      * check and highlight user defined  or php pre defined function
      *
      * @param string $code

@@ -73,27 +73,6 @@ class Highlight
     private static $square_bracket_ptrn = '/\[|\]/';
     private static $multi_line_comment_ptrn = '/\/\*|\*\//';
 
-
-    /**
-     * updates attributes of class property
-     *
-     * @param string $property
-     * @param string $values
-     * @return void
-     */
-    public static function set(string $property, string $values): void
-    {
-        if (property_exists(__CLASS__, $property))
-        {
-            self::${$property} = $values;
-        }
-        else
-        {
-            throw new \RuntimeException(sprintf('%s does not exist in %s', $property, __CLASS__));
-        }
-    }
-
-
     /**
      * check and highlight user defined  or php pre defined function
      *
