@@ -147,8 +147,10 @@ class Highlight
 
     /**
      * @param string $name
+     * @param string $default
+     * @return int (2 used $name, 1 used $default, 0 none, -1 no theme.json file found)
      */
-    public static function theme(string $name, bool $suppress_error = false)
+    public static function theme(string $name, string $default = null): int
     {
         $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
         if (file_exists($theme_file))
@@ -156,9 +158,11 @@ class Highlight
             $_theme = file_get_contents($theme_file);
             $theme = json_decode($_theme, true);
 
-            if (isset($theme[$name]))
+            $return_int = isset($theme[$name]) ? 2 : (isset($theme[$default]) ? 1 : 0);
+
+            if ($return_int !== 0)
             {
-                $properties = $theme[$name];
+                $properties = ($return_int == 2) ? $theme[$name] : $theme[$default];
                 foreach ( $properties as $property => $styles)
                 {
                     $style = '';
@@ -176,22 +180,9 @@ class Highlight
                     self::$$property = $style;
                 }
             }
-            else
-            {
-                if ( ! $suppress_error)
-                {
-                    throw new \RuntimeException('Theme (' . $name . ') was not found');
-                }
-            }
+            return $return_int;
         }
-        else
-        {
-            if ( ! $suppress_error)
-            {
-                throw new \RuntimeException('No theme.json file found');
-            }
-        }
-
+        return -1;
     }
 
 

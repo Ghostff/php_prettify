@@ -1,7 +1,7 @@
 <?php
 
 use PhpPrettify\Highlight;
-require 'src/PHP7.0/Highlight.php';
+require 'src/PHP5.3/Highlight.php';
 
 Highlight::showLineNumber(true);
 //echo '<pre>', Highlight::render('code.txt', 1, 0), '</pre>';exit;
