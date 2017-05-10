@@ -345,7 +345,7 @@ class Highlight
         $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
         $new_code = str_replace(['\"', '\\\'', '  '], ['"', '\'', '&nbsp;&nbsp;'], $new_code);
 
-        $style = '.strip font,.strip span{color:inherit !important}';
+        $style = '.strip font,.strip span{color:inherit !important;all:initial !important;all:unset !important}';
         $pretty = '<table style="' . self::$body .'">'. $new_code . '</table><style>' . $style . '</style>';
 
         if ($cache)
