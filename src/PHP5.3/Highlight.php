@@ -63,7 +63,7 @@ class Highlight
         (t(hrow|r(ait|y)))|
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while))\b/';
-    private static $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|[^a-z+]-[^a-z+]|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
+    private static $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|-(?!\w+:)|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
     private static $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
