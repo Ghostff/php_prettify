@@ -51,7 +51,7 @@ class Highlight
     private static $function_ptrn = '/(?<=\s|^)(function)(?=\s)/';
     private static $constant_ptrn = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
     private static $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray\s*(?=\()|s))|
-        (c(a(llable|se|tch)|l(ass(?!\=")|one)|on(st|tinue)))|
+        (c(a(llable|se|tch)|l(ass\s+|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
         (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
         (f(inal|or(each)?))|
@@ -69,7 +69,7 @@ class Highlight
     private static $parenthesis_ptrn = '/\(|\)/';
     private static $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
     private static $curly_braces_ptrn = '/[\{\}]/';
-    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span style="[\w:#-;]+" class="(variable|operators)"\>[\$||&amp;])/';
+    private static $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span style="[\w:#-;]+" class="(variable|operators)"\>[\$|&amp;])/';
     private static $square_bracket_ptrn = '/\[|\]/';
     private static $multi_line_comment_ptrn = '/\/\*|\*\//';
 
