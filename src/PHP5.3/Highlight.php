@@ -41,7 +41,7 @@ class Highlight
     private static $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private static $bool_ptrn = '/\b(?<!\$)true|false/i';
     private static $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private static $class_ptrn = '/(class|extends|implements)\s+(\w+)/';
+    private static $class_ptrn = '/(class|extends|implements)\s+([\w\\\]+)/';
     private static $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style)=))")/';
     private static $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private static $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';

@@ -1,8 +1,9 @@
 <?php
 
 namespace Text;
+use PhpPrettify as Php;
 
-class Text extends TextProcess implements Php
+class Text extends Namespace\TextProcess implements Php
 {
     /**
      * An array of the types that have been resolved.
