@@ -1,6 +1,6 @@
 # PHP Prettify
 
-Outputs or returns html markup for a syntax highlighted version of the given PHP code using the your defined colors.   
+Outputs or returns html markup for a syntax highlighted version of the given PHP code using your defined colors.   
 *includes PHP 7.1 version*
 
 ## Optional methods
