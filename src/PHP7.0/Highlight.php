@@ -118,20 +118,21 @@ class Highlight
      */
     private static function isFunction(string $code): string
     {
-        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function (array $arg): string
+        return preg_replace_callback('/([n|t]?.?)\b(\w+)(?=\s\(|\()/', function (array $arg): string
         {
-            $func = $arg[1];
-            if (function_exists($func))
+            $back = $arg[1];
+            $func = $arg[2];
+            if ($back == 'n ' || $back == 't;' || $back == ':')
             {
-                return '<span style="color:' . self::$php_function .'" class="php_function">' . $func . '</span>';
+                return $back . '<span style="color:' . self::$custom_function .'" class="custom_function">' . $func . '</span>';
+            }
+            elseif (function_exists($func))
+            {
+                return $back . '<span style="color:' . self::$php_function .'" class="php_function">' . $func . '</span>';
             }
             else
             {
-                if($func == 'array')
-                {
-                    return $func;
-                }
-                return '<span style="color:' . self::$custom_function .'" class="custom_function">' . $func . '</span>';
+                return $arg[0];
             }
         }, $code);
     }
@@ -441,7 +442,7 @@ class Highlight
      * @param bool $tabs_to_space
      * @return string
      */
-    public static function render(string $code, bool $is_file = false, bool $cache = true, bool $tabs_to_space = true): string
+    public static function render(string $code, bool $is_file = false, bool $cache = true): string
     {
         self::$cache_path = __DIR__ . DIRECTORY_SEPARATOR . '.caches';
         if ($is_file) {
@@ -452,8 +453,8 @@ class Highlight
                 }
             }
 
-            return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
+            return self::format(file_get_contents($code), $code, $cache);
         }
-        return self::format($code, '', false, true);
+        return self::format($code, '', false);
     }
 }

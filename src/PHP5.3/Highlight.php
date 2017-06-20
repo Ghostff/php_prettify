@@ -120,20 +120,21 @@ class Highlight
     {
         $php_func = self::$php_function;
         $custom_func = self::$custom_function;
-        return preg_replace_callback('/(\w+)(?=\s\(|\()/', function (array $arg) use ($php_func, $custom_func)
+        return preg_replace_callback('/([n|t]?.?)\b(\w+)(?=\s\(|\()/', function (array $arg) use ($php_func, $custom_func)
         {
-            $func = $arg[1];
-            if (function_exists($func))
+            $back = $arg[1];
+            $func = $arg[2];
+            if ($back == 'n ' || $back == 't;' || $back == ':' && $func != 'array')
             {
-                return '<span style="color:' . $php_func .'" class="php_function">' . $func . '</span>';
+                return $back . '<span style="color:' . $custom_func .'" class="custom_function">' . $func . '</span>';
+            }
+            elseif (function_exists($func))
+            {
+                return $back . '<span style="color:' . $php_func .'" class="php_function">' . $func . '</span>';
             }
             else
             {
-                if($func == 'array')
-                {
-                    return $func;
-                }
-                return '<span style="color:' . $custom_func .'" class="custom_function">' . $func . '</span>';
+                return $arg[0];
             }
 
         }, $code);
@@ -436,7 +437,7 @@ class Highlight
      * @param bool $is_file
      * @return string
      */
-    public static function render($code, $is_file = false, $cache = false, $expire = null, $tabs_to_space = true)
+    public static function render($code, $is_file = false, $cache = false, $expire = null)
     {
         if ($is_file) {
             self::$cache_path = __DIR__ . DIRECTORY_SEPARATOR . '.caches';
@@ -447,10 +448,10 @@ class Highlight
                         return $cached;
                     }
                 }
-                return self::format(file_get_contents($code), $code, $cache, $tabs_to_space);
+                return self::format(file_get_contents($code), $code, $cache);
             }
         }
-        return self::format($code, null, false, true);
+        return self::format($code, null, false);
     }
 
 }
