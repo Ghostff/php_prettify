@@ -48,6 +48,6 @@ Highlight::showLineNumber($flag, $start_line);
 * @param (array) attributes to add to line eg (array('class' => 'clsName'))
 * @param (bool) allows only one(last called) highlight.
 */
-Highlight::setHighlight($$line, array $attributes, $override);
+Highlight::setHighlight($line, array $attributes, $override);
 ```
 
