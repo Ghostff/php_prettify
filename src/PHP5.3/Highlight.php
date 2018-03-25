@@ -47,6 +47,7 @@ class Highlight
     private static $show_line_number = false;
 
     private static $body = '';
+    private static $default = '#000000';
     private static $cast = '#038C8C';
     private static $null = '#0000FF';
     private static $bool = '#D8C300';
@@ -384,8 +385,9 @@ class Highlight
         $new_code .= '<tr class="last-map"><td></td><td></td></tr>';
         $new_code = str_replace(array('\"', '\\\'', '  '), array('"', '\'', '&nbsp;&nbsp;'), $new_code);
 
+        $default_color = 'color:' . self::$default;
         $style = '.strip font,.strip span{color:inherit !important;all:initial !important;all:unset !important}';
-        $pretty = '<table style="' . self::$body .'">'. $new_code . '</table><style>' . $style . '</style>';
+        $pretty = '<table style="' . self::$body . $default_color . '">'. $new_code . '</table><style>' . $style . '</style>';
 
         if ($cache)
         {

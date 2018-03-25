@@ -1,6 +1,7 @@
 {
   "fastdev": {
       "body": { "background": "#282c34", "width": "100%" },
+      "default": {"color": "edb83d"},
       "keywords": { "color": "#edb83d"},
       "cast": { "color": "#038C8C" },
       "null": { "color": "#FF5D38" },
