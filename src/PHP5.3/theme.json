@@ -1,4 +1,32 @@
 {
+  "fastdev": {
+      "body": { "background": "#282c34", "width": "100%" },
+      "keywords": { "color": "#edb83d"},
+      "cast": { "color": "#038C8C" },
+      "null": { "color": "#FF5D38" },
+      "bool": { "color": "#FF5D38" },
+      "self": { "color": "#FF5D38" },
+      "quote": { "color": "#FFFFFF" },
+      "class": { "color": "#edb83d" },
+      "parent": { "color": "#edb83d" },
+      "number": { "color": "#edb83d" },
+      "comment": { "color": "#6e7a94", "font-style": "italic" },
+      "tag_open": { "color": "#F00000" },
+      "function": { "color": "#FF464E", "font-style": "bold" },
+      "variable": { "color": "#FF464E" },
+      "constant": { "color": "#0F255E" },
+      "tag_close": { "color": "#F00000" },
+      "operators": { "color": "#FFFFFF" },
+      "semi_colon": { "color": "#dee3ec" },
+      "parenthesis": { "color": "#FFFFFF" },
+      "return_type": { "color": "#FE648A" },
+      "php_function": { "color": "#edb83d" },
+      "curly_braces": { "color": "#dee3ec" },
+      "parameter_type": { "color": "#E3093F" },
+      "square_bracket": { "color": "#edb83d" },
+      "custom_function": { "color": "#edb83d" },
+      "multi_line_comment": { "color": "#6e7a94", "font-style": "italic" }
+  },
   "bittr": {
       "body": { "background": "#2b303b", "width": "100%" },
       "keywords": { "color": "#26A6A6"},
@@ -233,7 +261,3 @@
     "multi_line_comment": { "color": "#969896", "font-style": "italic" }
   }
 }
-
-
-
-
