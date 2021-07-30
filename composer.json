@@ -1,0 +1,20 @@
+{
+    "name": "ghostff/php_prettify",
+    "description": "Creates a syntax highlighted version of the given PHP code.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "ghostff\\Highlight\\": "src"
+        }
+    },
+    "authors": [
+        {
+            "name": "ghostff",
+            "email": "frankchris@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    }
+}

@@ -1,0 +1,35 @@
+<?php
+declare(strict_types=1);
+
+namespace Text;
+use PhpPrettify as Php;
+
+#[AttrCommas('foo'), AttrCommas(2342)]
+class Text extends Namespace\TextProcess implements Php
+{
+    /**
+     * An array of the types that have been resolved.
+     *
+     * @var array
+     */
+    protected $resolved = array();
+
+    public function isShared(#[Attr('foo')] string $abstract, int &$counter): bool
+    {
+        self::init(mt_rand(1, 55), parent::__construct(), ROOT_DIR);
+        if (isset($this->bindings[$abstract]['shared']) && ($counter != 0))
+        {
+            #cast to bool
+            (bool) $shared = $this->bindings[$abstract]['shared'];
+        }
+        else
+        {
+            $counter--;
+            $shared = false;
+        }
+
+        #smart function type dictation
+        self::hash(hash('sha1', 'foobar'), $this->hash());
+        return (isset($this->instances[$abstract]) || $shared === true);
+    }
+}
