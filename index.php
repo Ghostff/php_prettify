@@ -1,10 +1,9 @@
 <?php
-use PhpPrettify\Highlight;
 
 include_once 'src/Highlight.php';
 
 echo '<pre>',
-    (new Highlight)
+    (new ghostff\Highlight\Highlight())
         ->setTheme('bittr')                       // Sets code highlight theme.
         ->setStyle('body {margin:0;padding:0}')     // Append css to default to style.
         ->setHighlight(22, ['style' => 'color:red'])    // Add html attributes to selected line(tr).

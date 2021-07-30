@@ -42,7 +42,7 @@ class Highlight
     private $cast_ptrn = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
     private $bool_ptrn = '/\b(?<!\$)true|false/i';
     private $null_ptrn = '/\b(?<!\$)(null)\b/';
-    private $class_ptrn = '/(class|extends|implements)\s+([\w\\\]+)/';
+    private $class_ptrn = '/(class|extends|implements|enum)\s+([\w\\\]+)/';
     private $quote_ptrn = '/(.*?)(?<!\\\\)(\'|(?<!((style)=))")/';
     private $parent_ptrn = '/(?<!\$|\w)parent\b/';
     private $number_ptrn = '/(?<! style="color:#)\b(\d+)\b/';
@@ -51,10 +51,11 @@ class Highlight
     private $variable_ptrn = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
     private $function_ptrn = '/(?<=\s|^)(function)(?=\s)/';
     private $constant_ptrn = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
+    private $enum_patrn = '';
     private $keywords_ptrn = '/(?<!\$|\w)((a(bstract|nd|rray\s*(?=\()|s))|
         (c(a(llable|se|tch)|l(ass\s+|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
-        (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|val|x(it|tends)))|
+        (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|num|val|x(it|tends)))|
         (f(inal|or(each)?))|
         (g(lobal|oto))|
         (i(f|mplements|n(clude(_once)?|st(anceof|eadof)|terface)|sset))|
@@ -68,9 +69,9 @@ class Highlight
     private $operators_ptrn = '/((?<! (style|class))\=|\.|\!|\+|\%|-(?!\w+:)|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
     private $semi_colon_ptrn = '/(?<![&lt|&gt|&amp]);/';
     private $parenthesis_ptrn = '/\(|\)/';
-    private $return_type_ptrn = '/(?<=\:\<\/span\>)\s*(?:\<\w+ \w+="\w+:#\w+" \w+="\w+"\>\?\<\/\w+\>)*(string|bool|array|float|int|callable|void)/';
+    private $return_type_ptrn = '/(?<=\<\/span\>\:|\:\<\/span\>)\s*(?:\<span.*?\>\:<span>)*(string|bool|array|float|int|callable|void)/';
     private $curly_braces_ptrn = '/[\{\}]/';
-    private $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span style="[\w:#-;]+" class="(variable|operators)"\>[\$|&amp;])/';
+    private $parameter_type_ptrn = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span.*?class="(variable|operators)"\>[\$|&amp;])/';
     private $square_bracket_ptrn = '/\[|\]/';
     private $multi_line_comment_ptrn = '/\/\*|\*\//';
 

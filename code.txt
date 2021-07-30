@@ -33,3 +33,10 @@ class Text extends Namespace\TextProcess implements Php
         return (isset($this->instances[$abstract]) || $shared === true);
     }
 }
+
+enum Suit: string {
+    case Clubs = '♣';
+    case Diamonds = '♦';
+    case Hearts = '♥';
+    case Spades = '♠';
+}
