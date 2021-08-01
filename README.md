@@ -3,6 +3,11 @@
 Creates a syntax highlighted version of the given PHP code.
 
 ```bash
+# PHP 8
+composer require ghostff/php_prettify
+
+# Older PHP version
+composer require ghostff/php_prettify:5.4.093021
 composer require ghostff/php_prettify:7.0.093021
 ```
 

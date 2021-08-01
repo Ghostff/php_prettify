@@ -4,54 +4,54 @@ namespace ghostff\Highlight;
 
 class Highlight
 {
-    private $highlight        = [];
-    private $start_line       = 0;
-    private $line_selectable  = true;
-    private $cache_path       = __DIR__ . DIRECTORY_SEPARATOR . '.cache';
-    private $show_line_number = false;
-    private $style            = '.strip span{color:inherit !important;all:initial !important;all:unset !important}td[unselectable]{ user-select:none;-ms-user-select:none;-moz-user-select:none;-webkit-user-select:none; }';
+    private array  $highlight        = [];
+    private int    $start_line       = 0;
+    private bool   $line_selectable  = true;
+    private string $cache_path       = __DIR__ . DIRECTORY_SEPARATOR . '.cache';
+    private bool   $show_line_number = false;
+    private string $style            = '.strip span{color:inherit !important;all:initial !important;all:unset !important}td[unselectable]{ user-select:none;-ms-user-select:none;-moz-user-select:none;-webkit-user-select:none; }';
 
-    private $cast               = 'color:#038C8C';
-    private $null               = 'color:#0000FF';
-    private $bool               = 'color:#D8C300';
-    private $self               = 'color:#1D6F0C';
-    private $quote              = 'color:#FF0000';
-    private $class              = 'color:#000000';
-    private $parent             = 'color:#1D6F0C';
-    private $number             = 'color:#A4AC21';
-    private $attribute          = 'opacity:0.5';
-    private $comment            = 'color:#FEA500';
-    private $tag_open           = 'color:#F00000';
-    private $keywords           = 'color:#008000;';
-    private $function           = 'color:#0000FF';
-    private $variable           = 'color:#2071ED';
-    private $constant           = 'color:#8C4D03';
-    private $tag_close          = 'color:#F00000';
-    private $operators          = 'color:#0000FF';
-    private $semi_colon         = 'color:#000000';
-    private $parenthesis        = 'color:#038C8C';
-    private $return_type        = 'color:#E3093F';
-    private $php_function       = 'color:#6367A7';
-    private $curly_braces       = 'color:#7F5217';
-    private $parameter_type     = 'color:#E3093F';
-    private $square_bracket     = 'color:#F46164';
-    private $custom_function    = 'color:#A611AA';
-    private $multi_line_comment = 'color:#FEA500';
+    private string $cast               = 'color:#038C8C';
+    private string $null               = 'color:#0000FF';
+    private string $bool               = 'color:#D8C300';
+    private string $self               = 'color:#1D6F0C';
+    private string $quote              = 'color:#FF0000';
+    private string $class              = 'color:#000000';
+    private string $parent             = 'color:#1D6F0C';
+    private string $number             = 'color:#A4AC21';
+    private string $attribute          = 'opacity:0.5';
+    private string $comment            = 'color:#FEA500';
+    private string $tag_open           = 'color:#F00000';
+    private string $keywords           = 'color:#008000;';
+    private string $function           = 'color:#0000FF';
+    private string $variable           = 'color:#2071ED';
+    private string $constant           = 'color:#8C4D03';
+    private string $tag_close          = 'color:#F00000';
+    private string $operators          = 'color:#0000FF';
+    private string $semi_colon         = 'color:#000000';
+    private string $parenthesis        = 'color:#038C8C';
+    private string $return_type        = 'color:#E3093F';
+    private string $php_function       = 'color:#6367A7';
+    private string $curly_braces       = 'color:#7F5217';
+    private string $parameter_type     = 'color:#E3093F';
+    private string $square_bracket     = 'color:#F46164';
+    private string $custom_function    = 'color:#A611AA';
+    private string $multi_line_comment = 'color:#FEA500';
 
-    private $self_ptrn               = '/(?<!\$|\w)self/';
-    private $cast_ptrn               = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
-    private $bool_ptrn               = '/\b(?<!\$)true|false/i';
-    private $null_ptrn               = '/\b(?<!\$)(null)\b/';
-    private $class_ptrn              = '/(class|extends|implements|enum)\s+([\w\\\]+)/';
-    private $quote_ptrn              = '/(.*?)(?<!\\\\)(\'|(?<!((style)=))")/';
-    private $parent_ptrn             = '/(?<!\$|\w)parent\b/';
-    private $number_ptrn             = '/(?<! style="color:#)\b(\d+)\b/';
-    private $comment_ptrn            = '/(?<!http:|https:)\/\/.*|(?<!color:)#(?!\s*\[).*/';
-    private $attribute_ptrn          = '/(?<!color:)#\s*\[.*\]/';
-    private $variable_ptrn           = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
-    private $function_ptrn           = '/(?<=\s|^)(function)(?=\s)/';
-    private $constant_ptrn           = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
-    private $keywords_ptrn           = '/(?<!\$|\w)((a(bstract|nd|rray\s*(?=\()|s))|
+    private string $self_ptrn               = '/(?<!\$|\w)self/';
+    private string $cast_ptrn               = '/(\(\s*(int|string|float|array|object|unset|binary|bool)\s*\))/';
+    private string $bool_ptrn               = '/\b(?<!\$)true|false/i';
+    private string $null_ptrn               = '/\b(?<!\$)(null)\b/';
+    private string $class_ptrn              = '/(class|extends|implements|enum)\s+([\w\\\]+)/';
+    private string $quote_ptrn              = '/(.*?)(?<!\\\\)(\'|(?<!((style)=))")/';
+    private string $parent_ptrn             = '/(?<!\$|\w)parent\b/';
+    private string $number_ptrn             = '/(?<! style="color:#)\b(\d+)\b/';
+    private string $comment_ptrn            = '/(?<!http:|https:)\/\/.*|(?<!color:)#(?!\s*\[).*/';
+    private string $attribute_ptrn          = '/(?<!color:)#\s*\[.*\]/';
+    private string $variable_ptrn           = '/\$(\$*)[a-zA-Z_]+[a-zA-Z0-9_]*/';
+    private string $function_ptrn           = '/(?<=\s|^)(function)(?=\s)/';
+    private string $constant_ptrn           = '/\b(?<!(\#|\$))([A-Z_]+)(?!<\/\w+>\()\b/';
+    private string $keywords_ptrn           = '/(?<!\$|\w)((a(bstract|nd|rray\s*(?=\()|s))|
         (c(a(llable|se|tch)|l(ass\s+|one)|on(st|tinue)))|
         (d(e(clare|fault)|ie|o))|
         (e(cho|lse(if)?|mpty|nd(declare|for(each)?|if|switch|while)|num|val|x(it|tends)))|
@@ -65,20 +65,20 @@ class Highlight
         (t(hrow|r(ait|y)))|
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while|match))\b/';
-    private $operators_ptrn          = '/((?<! (style|class))\=|\.|\!|\+|\%|-(?!\w+:)|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
-    private $semi_colon_ptrn         = '/(?<![&lt|&gt|&amp]);/';
-    private $parenthesis_ptrn        = '/\(|\)/';
-    private $return_type_ptrn        = '/(?<=\<\/span\>\:|\:\<\/span\>)\s*(?:\<span.*?\>\:<span>)*(string|bool|array|float|int|callable|void)/';
-    private $curly_braces_ptrn       = '/[\{\}]/';
-    private $parameter_type_ptrn     = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span.*?class="(variable|operators)"\>[\$|&amp;])/';
-    private $square_bracket_ptrn     = '/\[|\]/';
-    private $multi_line_comment_ptrn = '/\/\*|\*\//';
+    private string $operators_ptrn          = '/((?<! (style|class))\=|\.|\!|\+|\%|-(?!\w+:)|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
+    private string $semi_colon_ptrn         = '/(?<![&lt|&gt|&amp]);/';
+    private string $parenthesis_ptrn        = '/\(|\)/';
+    private string $return_type_ptrn        = '/(?<=\<\/span\>\:|\:\<\/span\>)\s*(?:\<span.*?\>\:<span>)*(string|bool|array|float|int|callable|void)/';
+    private string $curly_braces_ptrn       = '/[\{\}]/';
+    private string $parameter_type_ptrn     = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span.*?class="(variable|operators)"\>[\$|&amp;])/';
+    private string $square_bracket_ptrn     = '/\[|\]/';
+    private string $multi_line_comment_ptrn = '/\/\*|\*\//';
 
     /**
      * check and highlight user defined  or php pre defined function.
      *
      * @param string $code
-     * @return array|string|string[]|null
+     * @return string
      */
     private function isFunction(string $code): string
     {
@@ -86,7 +86,7 @@ class Highlight
         {
             $back = $arg[1];
             $func = $arg[2];
-            if ($back == 'n ' || $back == 't;' || $back == ':' && $func != 'array') {
+            if ($back == 'n ' || $back == 't;' || ($back == ':' && $func != 'array')) {
                 return "{$back}<span style=\"{$this->custom_function}\" class=\"custom_function\">{$func}</span>";
             }
             elseif (function_exists($func)) {
@@ -165,7 +165,7 @@ class Highlight
                 }, $line);
             }
 
-            if ( ! $is_MLC)
+            if (! $is_MLC)
             {
                 if ($is_MLQ) {
                     $line = "<span style=\"{$this->quote}\" class=\"strip quote\">{$line}</span>";
@@ -275,7 +275,7 @@ class Highlight
      *
      * @param string $file_name
      * @param string|null $content
-     * @return string|null
+     * @return string
      */
     private function cache(string $file_name, string $content = null): string
     {
@@ -361,10 +361,7 @@ class Highlight
         $theme_file = __DIR__ . DIRECTORY_SEPARATOR . 'theme.json';
         if (file_exists($theme_file))
         {
-            $all_themes = json_decode(file_get_contents($theme_file), true);
-            if ($all_themes === null) {
-                throw new \Exception('Invalid/Corrupted theme.json file');
-            }
+            $all_themes = json_decode(file_get_contents($theme_file), true, JSON_THROW_ON_ERROR);
 
             if (! isset($all_themes[$name])) {
                 throw new \Exception("\"{$name}\" is not a valid theme name");
