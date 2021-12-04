@@ -35,4 +35,3 @@ echo '<pre>', (new Highlight)
 ```
 
 ![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/dark.png)   
-![alt tag](https://github.com/Ghostff/php_prettify/blob/master/images/light.png)

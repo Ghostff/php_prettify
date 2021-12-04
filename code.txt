@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Text;
-use PhpPrettify as Php;
+namespace DateTime as Date;
 
 #[AttrCommas('foo'), AttrCommas(2342)]
-class Text extends Namespace\TextProcess implements Php
+class Text extends Namespace\TextProcess implements RandomInterface
 {
     /**
      * An array of the types that have been resolved.
@@ -13,6 +12,7 @@ class Text extends Namespace\TextProcess implements Php
      * @var array
      */
     protected $resolved = array();
+    protected readonly DateTime $date;
 
     public function isShared(#[Attr('foo')] string $abstract, int &$counter): bool
     {
@@ -28,7 +28,7 @@ class Text extends Namespace\TextProcess implements Php
             $shared = false;
         }
 
-        #smart function type dictation
+        #function type dictation
         self::hash(hash('sha1', 'foobar'), $this->hash());
         return (isset($this->instances[$abstract]) || $shared === true);
     }

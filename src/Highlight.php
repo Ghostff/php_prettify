@@ -28,7 +28,6 @@ class Highlight
     private string $constant           = 'color:#8C4D03';
     private string $tag_close          = 'color:#F00000';
     private string $operators          = 'color:#0000FF';
-    private string $semi_colon         = 'color:#000000';
     private string $parenthesis        = 'color:#038C8C';
     private string $return_type        = 'color:#E3093F';
     private string $php_function       = 'color:#6367A7';
@@ -60,15 +59,14 @@ class Highlight
         (i(f|mplements|n(clude(_once)?|st(anceof|eadof)|terface)|sset))|
         (n(amespace|ew))|
         (p(r(i(nt|vate)|otected)|ublic))|
-        (re(quire(_once)?|turn))|
+        (re(quire(_once)?|turn|adonly))|
         (s(tatic|witch))|
         (t(hrow|r(ait|y)))|
         (u(nset(?!\s*\))|se))|
         (__halt_compiler|break|list|(x)?or|var|while|match))\b/';
     private string $operators_ptrn          = '/((?<! (style|class))\=|\.|\!|\+|\%|-(?!\w+:)|(?<!https|http)[^a-z+]:|\@|\||\?|&gt;|&lt;|&amp;)/';
-    private string $semi_colon_ptrn         = '/(?<![&lt|&gt|&amp]);/';
     private string $parenthesis_ptrn        = '/\(|\)/';
-    private string $return_type_ptrn        = '/(?<=\<\/span\>\:|\:\<\/span\>)\s*(?:\<span.*?\>\:<span>)*(string|bool|array|float|int|callable|void)/';
+    private string $return_type_ptrn        = '/(?<=\<\/span\>\:|\:\<\/span\>)\s*(?:\<span.*?\>\:<span>)*(string|bool|array|float|int|callable|void|never)/';
     private string $curly_braces_ptrn       = '/[\{\}]/';
     private string $parameter_type_ptrn     = '/(?<!\w)(string|bool|array|float|int|callable)\s*(?=\<span.*?class="(variable|operators)"\>[\$|&amp;])/';
     private string $square_bracket_ptrn     = '/\[|\]/';
@@ -125,12 +123,11 @@ class Highlight
 
         while ($token !== false)
         {
-            $value = rtrim($token, PHP_EOL);
-            if ($value == '') {
-                $value = '  ';
+            $line = rtrim($token, PHP_EOL);
+            if ($line == '') {
+                $line = '  ';
             }
 
-            $line = preg_replace($this->semi_colon_ptrn, "<span style=\"{$this->semi_colon}\" class=\"semi_colon\">\$0</span>", $value);
             $gui_line_number = $this->show_line_number ? "<td" . ($this->line_selectable ? '' : ' unselectable="on"') . ">{$start_number}</td><td>" : '<td>';
 
             if (isset($this->highlight[$start_number]))
